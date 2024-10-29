@@ -16,7 +16,6 @@
 
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.net.URL
 
@@ -42,10 +41,15 @@ tasks.named<KotlinJvmCompile>("compileKotlin") {
     }
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 sourceSets["main"].java.srcDir("src/main/kotlin")
 
 dependencies {
     implementation(libs.kotlin.reflect)
+    testImplementation(kotlin("test"))
 }
 
 extra["PUBLISH_ARTIFACT_ID"] = "VastCore"
