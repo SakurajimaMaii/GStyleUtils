@@ -24,9 +24,15 @@ import com.ave.vastgui.adapter.BaseBindPagingAdapter
 import com.ave.vastgui.app.BR
 import com.ave.vastgui.app.adapter.entity.VideoDiffUtil
 import com.ave.vastgui.app.databinding.FragmentVideosBinding
+import com.ave.vastgui.app.log.logFactory
 import com.ave.vastgui.app.viewmodel.SharedVM
+import com.ave.vastgui.tools.bean.UserBean
 import com.ave.vastgui.tools.fragment.VastVbVmFragment
 import com.ave.vastgui.tools.view.toast.SimpleToast
+import com.log.vastgui.android.lifecycle.LogLifecycle
+import com.log.vastgui.android.lifecycle.LogLifecycleEvent
+import com.log.vastgui.core.annotation.LogExperimental
+import com.log.vastgui.core.base.LogTag
 import kotlinx.coroutines.launch
 
 // Author: SakurajimaMai
@@ -34,11 +40,13 @@ import kotlinx.coroutines.launch
 // Documentation: https://ave.entropy2020.cn/documents/tools/app-entry-points/fragments/fragment/
 // Documentation: https://ave.entropy2020.cn/documents/VastAdapter/
 
+@LogLifecycle("MyFragment", [LogLifecycleEvent.ON_CREATE, LogLifecycleEvent.ON_RESUME])
 class VideosFragment : VastVbVmFragment<FragmentVideosBinding, SharedVM>() {
 
     private val mAdapter by lazy {
         BaseBindPagingAdapter(requireContext(), BR.video, VideoDiffUtil)
     }
+    private val mLogcat = logFactory("VideosFragment")
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -57,5 +65,32 @@ class VideosFragment : VastVbVmFragment<FragmentVideosBinding, SharedVM>() {
 //                mAdapter.submitData(it)
 //            }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        eObjectUsage()
+    }
+
+    @OptIn(LogExperimental::class)
+    fun eObjectUsage() {
+        val tag = LogTag(TAG)
+        mLogcat.e(tag, Exception(HELLO_WORLD))
+        mLogcat.e(tag, person)
+        mLogcat.e(tag) { person }
+        mLogcat.e(tag, person, Exception(HELLO_WORLD))
+        mLogcat.e(tag, Exception(HELLO_WORLD)) { person }
+        mLogcat.e(tag, Exception(HELLO_WORLD))
+        mLogcat.e(person)
+        mLogcat.e { person }
+        mLogcat.e(person, Exception(HELLO_WORLD))
+        mLogcat.e(Exception(HELLO_WORLD)) { person }
+        mLogcat.e(Exception(HELLO_WORLD))
+    }
+
+    companion object {
+        private const val TAG = "VideosFragment"
+        private const val HELLO_WORLD = "Hello World."
+        private val person = UserBean("Ming", "19")
     }
 }

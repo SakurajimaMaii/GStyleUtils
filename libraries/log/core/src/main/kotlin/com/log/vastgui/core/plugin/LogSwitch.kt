@@ -26,9 +26,14 @@ import com.log.vastgui.core.plugin.LogSwitch.Configuration
 // Documentation: https://ave.entropy2020.cn/documents/log/log-core/plugin/switch/
 
 /**
- * LogSwitch.
+ * [LogSwitch] is used to control whether to enable logging.
  *
- * @property open Refer to [Configuration.open].
+ * Before the **1.3.8** version, if the user does not install [LogSwitch],
+ * the log will be printed by default. From **1.3.8** Starting from
+ * version, users can only enable logs if they have installed [LogSwitch]
+ * and set [LogSwitch.open] to `true` .
+ *
+ * @see LogStateChecker
  * @since 0.5.2
  */
 class LogSwitch internal constructor(
@@ -39,7 +44,7 @@ class LogSwitch internal constructor(
      * Configuration of [LogSwitch].
      *
      * @property open [LogCat] will print log when the [open] is true and the
-     *     app is in debug mode.
+     * app is in debug mode.
      * @since 0.5.4
      */
     class Configuration {

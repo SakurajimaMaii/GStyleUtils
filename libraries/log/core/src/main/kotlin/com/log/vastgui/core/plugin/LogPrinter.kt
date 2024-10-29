@@ -49,7 +49,7 @@ class LogPrinter private constructor(private val mConfiguration: Configuration) 
      *
      * @since 1.3.4
      */
-    private val levelMap: MutableMap<LogLevel, Boolean> = mutableMapOf(
+    private val mLevelMap: MutableMap<LogLevel, Boolean> = mutableMapOf(
         VERBOSE to false, DEBUG to false, INFO to false,
         WARN to false, ERROR to false, ASSERT to false
     )
@@ -79,7 +79,7 @@ class LogPrinter private constructor(private val mConfiguration: Configuration) 
      *
      * @since 1.3.1
      */
-    internal fun printLog(logInfo: LogInfo) {
+    private fun printLog(logInfo: LogInfo) {
         mLogger.log(logInfo)
     }
 
@@ -87,12 +87,12 @@ class LogPrinter private constructor(private val mConfiguration: Configuration) 
         // Use level
         if (mConfiguration.levelSet.isEmpty()) {
             allLogLevel.filter { level -> level >= mConfiguration.level }
-                .forEach { levelMap[it] = true }
+                .forEach { mLevelMap[it] = true }
         }
         // Use levelList
         else {
             mConfiguration.levelSet.forEach {
-                levelMap[it] = true
+                mLevelMap[it] = true
             }
         }
     }
@@ -107,7 +107,7 @@ class LogPrinter private constructor(private val mConfiguration: Configuration) 
 
         override fun install(plugin: LogPrinter, scope: LogCat) {
             scope.logPipeline.intercept(LogPipeline.State) {
-                if (plugin.levelMap[subject.level] == false) {
+                if (plugin.mLevelMap[subject.level] == false) {
                     finish()
                 }
             }

@@ -34,10 +34,12 @@ class ReceiverFragment : Fragment(R.layout.fragment_receiver) {
 
     private val mViewModel by viewModels<SharedVM>({ requireActivity() })
     private val mBinding by viewBinding(FragmentReceiverBinding::bind)
-    private val mLogger = logFactory.getLogCat(ReceiverFragment::class.java)
+    private val mLogcat = logFactory.getLogCat(ReceiverFragment::class.java)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        mViewModel.getSentenceAutoHandle()
 
         mViewModel.sentence.observe(requireActivity()) {
             mBinding.sentence.text = it.toString()
@@ -45,13 +47,13 @@ class ReceiverFragment : Fragment(R.layout.fragment_receiver) {
 
         mViewModel.sentence.observeState(requireActivity()) {
             onSuccess = {
-                mLogger.d("请求成功")
+                mLogcat.d("请求成功")
             }
             onError = {
-                mLogger.d("遇到异常${it?.message}")
+                mLogcat.d("遇到异常${it?.message}")
             }
             onFailed = { code, message ->
-                mLogger.d("请求失败，错误代码${code}，错误信息${message}")
+                mLogcat.d("请求失败，错误代码${code}，错误信息${message}")
             }
         }
     }

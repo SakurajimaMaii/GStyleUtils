@@ -20,47 +20,29 @@ import android.os.Bundle
 import android.view.MotionEvent
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import com.ave.vastgui.app.R
 import com.ave.vastgui.app.databinding.ActivityFileBinding
 import com.ave.vastgui.app.log.logFactory
-import com.ave.vastgui.app.net.LocalApi
-import com.ave.vastgui.app.net.LocalApiService
-import com.ave.vastgui.tools.network.request.create
-import com.ave.vastgui.tools.utils.drawable
+import com.ave.vastgui.tools.manager.filemgr.FileMgr
 import com.ave.vastgui.tools.view.extension.hideKeyBroad
 import com.ave.vastgui.tools.view.extension.isShouldHideKeyBroad
 import com.ave.vastgui.tools.viewbinding.viewBinding
-import kotlinx.coroutines.launch
+import com.log.vastgui.android.lifecycle.LogLifecycle
 
 // Author: SakurajimaMai
 // Email: guihy2019@gmail.com
 // Date: 2022/5/31
 // Documentation: https://ave.entropy2020.cn/documents/tools/core-topics/app-data-and-files/file-manager/file-mgr/
 
+@LogLifecycle
 class FileActivity : AppCompatActivity(R.layout.activity_file) {
 
-    private val logcat = logFactory(FileActivity::class.java)
-    private val binding by viewBinding(ActivityFileBinding::bind)
+    private val mLogcat = logFactory("FileActivity")
+    private val mBinding by viewBinding(ActivityFileBinding::bind)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        lifecycleScope.launch {
-            LocalApi().create(LocalApiService::class.java)
-                .getLocalData()
-        }
-
-        binding.button.setOnClickListener {
-            logcat.d("这是一条日志")
-            logcat.e(NullPointerException("this object is null."))
-        }
-        val drawable = drawable(R.drawable.ic_github).also {
-            logcat.d(it!!::class.java.simpleName)
-        }
-        binding.icon1.run {  }
-        null.isNullOrBlank()
-        binding.icon1.setImageDrawable(drawable)
+        getFileUri()
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -73,6 +55,11 @@ class FileActivity : AppCompatActivity(R.layout.activity_file) {
             }
         }
         return super.onTouchEvent(event)
+    }
+
+    private fun getFileUri() {
+        val uri = FileMgr.getFileUriOnApi23(FileMgr.getAssetsFile("test.jpg"))
+        mBinding.icon1.setImageURI(uri)
     }
 
 }

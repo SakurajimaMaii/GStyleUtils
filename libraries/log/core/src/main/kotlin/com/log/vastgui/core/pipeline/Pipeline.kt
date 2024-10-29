@@ -48,7 +48,7 @@ open class Pipeline<TSubject : Any, TContext : Any>(vararg phases: PipelinePhase
 
     /**
      * @return `true` if there are no interceptors installed regardless number
-     *     of phases.
+     * of phases.
      * @since 1.3.4
      */
     val isEmpty: Boolean
@@ -60,7 +60,7 @@ open class Pipeline<TSubject : Any, TContext : Any>(vararg phases: PipelinePhase
      *
      * @since 1.3.4
      */
-    fun execute(context: TContext, subject: TSubject): TSubject {
+    internal fun execute(context: TContext, subject: TSubject): TSubject {
         val pipelineContext = createContext(context, subject)
         return pipelineContext.execute(subject)
     }

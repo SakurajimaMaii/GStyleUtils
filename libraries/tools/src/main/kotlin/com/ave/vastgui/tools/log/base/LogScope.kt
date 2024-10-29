@@ -17,6 +17,7 @@
 package com.ave.vastgui.tools.log.base
 
 import android.content.ComponentCallbacks2
+import com.ave.vastgui.core.extension.NotNUllVar
 import com.ave.vastgui.tools.content.ContextHelper
 import com.log.vastgui.core.base.LogInfo
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -38,16 +39,11 @@ import kotlin.coroutines.CoroutineContext
  *
  * @since 1.3.1
  */
-open class LogScope internal constructor(){
-
-    /** @since 1.3.1 */
-    private val mHandler = CoroutineExceptionHandler { context, exception ->
-        handleCoroutineExceptionHandler(context, exception)
-    }
+open class LogScope internal constructor() {
 
     /** @since 1.3.1 */
     protected val mLogScope: CoroutineScope =
-        CoroutineScope(SupervisorJob() + Dispatchers.IO + CoroutineName("LogScope") + mHandler)
+        CoroutineScope(SupervisorJob() + Dispatchers.IO + CoroutineName("LogScope") + handler)
 
     /**
      * A channel of [LogInfo].
@@ -56,12 +52,30 @@ open class LogScope internal constructor(){
      */
     protected val mLogChannel: Channel<LogInfo> = Channel()
 
-    /** @since 1.3.1 */
-    protected open fun handleCoroutineExceptionHandler(
-        context: CoroutineContext,
-        exception: Throwable
-    ) {
-        TODO("Please return a CoroutineExceptionHandler.")
+    companion object {
+        /** @since 1.5.1 */
+        internal var exceptionLog: ExceptionLog? = null
+
+        /** @since 1.5.1 */
+        internal var exceptionStorage: ExceptionStorage? = null
+
+        /** @since 1.5.1 */
+        private val handler = CoroutineExceptionHandler { context, exception ->
+            exceptionLog?.log(context, exception)
+            exceptionStorage?.storage(context, exception)
+        }
+    }
+
+    /** @since 1.5.1 */
+    @FunctionalInterface
+    internal fun interface ExceptionLog {
+        fun log(context: CoroutineContext, exception: Throwable)
+    }
+
+    /** @since 1.5.1 */
+    @FunctionalInterface
+    internal fun interface ExceptionStorage {
+        fun storage(context: CoroutineContext, exception: Throwable)
     }
 
     init {
@@ -71,7 +85,7 @@ open class LogScope internal constructor(){
             }
 
             override fun onLowMemory() {
-                mLogScope.cancel("Cancel mLogScope onLowMemory.")
+                mLogScope.cancel("Cancel LogScope onLowMemory.")
             }
 
             override fun onTrimMemory(level: Int) {

@@ -29,9 +29,9 @@ import com.log.vastgui.core.base.LogInfo
  * information, you can use [OnlyMsgFormat].
  *
  * @see <img
- *     src=https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/log/core/image/only_msg_format.png?raw=true/>
+ * src=https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/log/core/image/only_msg_format.png?raw=true/>
  * @since 1.3.4
  */
 object OnlyMsgFormat : LogFormat {
-    override fun format(logInfo: LogInfo) = logInfo.mContent
+    override fun format(logInfo: LogInfo) = logInfo.content
 }

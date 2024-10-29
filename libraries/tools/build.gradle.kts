@@ -18,13 +18,12 @@ import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import java.net.URL
 
 plugins {
+    kotlin("android")
+    kotlin("kapt")
+    kotlin("plugin.serialization")
     id("com.android.library")
-    id("kotlin-android")
-    id("kotlin-kapt")
-    id("org.jetbrains.kotlin.android")
     id("convention.publication")
     id("org.jetbrains.dokka")
-    kotlin("plugin.serialization")
 }
 
 android {
@@ -109,7 +108,10 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.recyclerview)
     implementation(libs.retrofit)
-    implementation(projects.libraries.log.core)
+    implementation(projects.libraries.kernel)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.junit)
+    testImplementation(libs.junit)
 }
 
 extra["PUBLISH_ARTIFACT_ID"] = "VastTools"
@@ -123,7 +125,7 @@ if (mavenPropertiesFile.exists()) {
             register<MavenPublication>("release") {
                 groupId = "io.github.sakurajimamaii"
                 artifactId = "VastTools"
-                version = "1.5.0"
+                version = "1.5.1"
 
                 afterEvaluate {
                     from(components["release"])

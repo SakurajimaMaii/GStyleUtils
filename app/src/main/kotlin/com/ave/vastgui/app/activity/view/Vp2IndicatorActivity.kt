@@ -31,6 +31,7 @@ import com.ave.vastgui.tools.activity.widget.screenConfig
 import com.ave.vastgui.tools.adapter.VastFragmentAdapter
 import com.ave.vastgui.tools.utils.DensityUtils.DP
 import com.ave.vastgui.tools.viewbinding.viewBinding
+import com.log.vastgui.android.lifecycle.LogLifecycle
 
 // Author: Vast Gui 
 // Email: guihy2019@gmail.com
@@ -38,6 +39,7 @@ import com.ave.vastgui.tools.viewbinding.viewBinding
 // Documentation: https://ave.entropy2020.cn/documents/tools/core-topics/ui/viewpager2/fragment-adapter/
 // Documentation: https://ave.entropy2020.cn/documents/tools/core-topics/ui/viewpager2/vp2-indicator-view/vp2-indicator-view/
 
+@LogLifecycle
 class Vp2IndicatorActivity : AppCompatActivity() {
 
     private val mBinding by viewBinding(ActivityVp2IndicatorBinding::inflate)

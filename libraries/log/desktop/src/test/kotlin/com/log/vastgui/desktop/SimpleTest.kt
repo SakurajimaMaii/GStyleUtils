@@ -23,7 +23,7 @@ import org.junit.Test
 // Date: 2024/5/14 23:59
 
 class SimpleTest {
-    private val logcat = logFactory(SimpleTest::class.java)
+    private val logcat = logFactory("SimpleTest")
 
     @Test
     fun logTest() {

@@ -17,17 +17,16 @@
 package com.ave.vastgui.tools.log
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.IntRange
+import com.ave.vastgui.tools.log.AndroidStore.Companion.fileNameTimeSdf
 import com.ave.vastgui.tools.log.base.LogScope
+import com.ave.vastgui.tools.log.base.LogScope.ExceptionStorage
 import com.ave.vastgui.tools.log.base.LogSp
-import com.ave.vastgui.tools.log.base.fileNameTimeSdf
 import com.ave.vastgui.tools.manager.filemgr.FileMgr
 import com.ave.vastgui.tools.utils.AppUtils
-import com.google.gson.JsonParser
-import com.log.vastgui.core.base.JSON_TYPE
 import com.log.vastgui.core.base.LogFormat
 import com.log.vastgui.core.base.LogInfo
+import com.log.vastgui.core.base.LogLevel
 import com.log.vastgui.core.base.LogStore
 import com.log.vastgui.core.format.DEFAULT_MAX_PRINT_TIMES
 import com.log.vastgui.core.format.DEFAULT_MAX_SINGLE_LOG_LENGTH
@@ -40,7 +39,7 @@ import java.io.FileWriter
 import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
 import java.text.SimpleDateFormat
-import kotlin.coroutines.CoroutineContext
+import java.util.Locale
 
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
@@ -83,7 +82,7 @@ fun LogStore.Companion.android(
  * @property logFormat The log format in file.
  * @property mFileName The name of the log file.
  * @property mLogSp LogSp is used to save the log file name of the last
- *     operation.
+ * operation.
  * @property mCurrentFile Current file which will save log.
  * @since 1.3.1
  */
@@ -112,21 +111,7 @@ class AndroidStore internal constructor(
      * @since 0.5.3
      */
     private fun storage(logInfo: LogInfo) {
-        val message = if (JSON_TYPE == logInfo.mType) {
-            val info = LogInfo(
-                logInfo.mThreadName,
-                logInfo.mStackTrace,
-                logInfo.mLevel,
-                logInfo.mTag,
-                logInfo.mTime,
-                JsonParser.parseString(logInfo.mContent).asJsonObject.toString(),
-                logInfo.mType,
-                logInfo.mThrowable
-            )
-            logFormat.format(info)
-        } else {
-            logFormat.format(logInfo)
-        }
+        val message = logFormat.format(logInfo)
         val currentNeedSize = mCurrentFile.getCurrentSize() + message.toByteArray().size.toLong()
         if (currentNeedSize > fileMaxSize) {
             mCurrentFile = getCurrentFile(true)
@@ -181,25 +166,27 @@ class AndroidStore internal constructor(
         length()
     }
 
-    override fun handleCoroutineExceptionHandler(context: CoroutineContext, exception: Throwable) {
-        Log.e(TAG, "$TAG encounter exception.", exception)
-    }
-
     init {
         mLogScope.launch {
             while (isActive) {
-                runCatching {
-                    val info = mLogChannel.receive()
-                    storage(info)
-                }.onFailure {
-                    Log.e(TAG, "${TAG}:${it.stackTraceToString()}", it)
-                }
+                val info = mLogChannel.receive()
+                storage(info)
             }
+        }
+
+        exceptionStorage = ExceptionStorage { _, exception ->
+            val threadName = Thread.currentThread().name
+            val info = LogInfo(threadName, exception.stackTrace[0], LogLevel.ERROR, TAG,
+                System.currentTimeMillis(), exception.stackTraceToString(), exception)
+            storage(info)
         }
     }
 
     companion object {
         const val TAG = "AndroidStore"
+
+        /** @since 1.3.1 */
+        internal val fileNameTimeSdf = SimpleDateFormat("yyyyMMdd", Locale.ENGLISH)
     }
 
 }

@@ -54,7 +54,9 @@ class LogTypeValidator internal constructor() {
                         "Can not convert ${subject.content().javaClass}, please install a specific converter plugin."
                     // Because log printing will be affected by the configured level,
                     // the original log level is retained here.
-                    val builder = LogInfoFactory(subject.level, key, message)
+                    val threadName = Thread.currentThread().name
+                    val trace = Throwable().stackTrace[13]
+                    val builder = LogInfoFactory(subject.level, subject.tag, message, threadName, trace)
                     proceedWith(builder)
                 } else {
                     proceed()

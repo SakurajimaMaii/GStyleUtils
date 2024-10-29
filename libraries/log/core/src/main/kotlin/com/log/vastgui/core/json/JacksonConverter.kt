@@ -17,6 +17,7 @@
 package com.log.vastgui.core.json
 
 import com.ave.vastgui.core.extension.SingletonHolder
+import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.databind.ObjectMapper
 
 // Author: Vast Gui
@@ -30,19 +31,28 @@ import com.fasterxml.jackson.databind.ObjectMapper
  */
 class JacksonConverter private constructor(override val isPretty: Boolean) : Converter {
 
-    private val mapper = ObjectMapper()
-
-    override fun toJson(data: Any): String = if (isPretty) {
-        mapper.writerWithDefaultPrettyPrinter().writeValueAsString(data)
-    } else {
-        mapper.writeValueAsString(data)
+    private val mapper by lazy {
+        val factory = JsonFactory.builder()
+            .configure(JsonFactory.Feature.CHARSET_DETECTION,false)
+            .build()
+        ObjectMapper(factory)
     }
 
-    override fun parseString(jsonString: String): String = runCatching {
+    override fun toJson(data: Any): String =runCatching {
         if (isPretty) {
-            mapper.readTree(jsonString).toPrettyString()
+            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(data)
         } else {
-            mapper.readTree(jsonString).toString()
+            mapper.writeValueAsString(data)
+        }
+    }.getOrDefault(data.toString())
+
+    override fun parseString(jsonString: String): String = runCatching {
+        val jsonNode = mapper.readTree(jsonString)
+        if(jsonNode.isNull) return@runCatching jsonString
+        if (isPretty) {
+            jsonNode.toPrettyString()
+        } else {
+            jsonNode.toString()
         }
     }.getOrDefault(jsonString)
 

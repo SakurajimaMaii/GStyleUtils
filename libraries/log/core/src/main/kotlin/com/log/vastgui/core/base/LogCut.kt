@@ -30,7 +30,7 @@ import com.log.vastgui.core.annotation.LogApi
  */
 @LogApi
 fun LogInfo.needCut(maxSingleLogLength: Int) =
-    !(mPrintLength < maxSingleLogLength || (maxSingleLogLength * 4) >= mPrintBytesLength)
+    !(printLength < maxSingleLogLength || (maxSingleLogLength * 4) >= printBytesLength)
 
 /**
  * Cutting the byte array as a string according to [maxSingleLogLength].

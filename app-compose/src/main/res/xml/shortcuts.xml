@@ -25,6 +25,6 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.ave.vastgui.appcompose"
-            android:targetClass="com.ave.vastgui.appcompose.MainActivity" />
+            android:targetClass="com.ave.vastgui.appcompose.ui.MainActivity" />
     </shortcut>
 </shortcuts>

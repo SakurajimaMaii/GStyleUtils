@@ -1,3 +1,18 @@
+/*
+ * Copyright 2021-2024 VastGui
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -5,14 +20,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.net.URL
 
 plugins {
-    id("java-library")
+    kotlin("jvm")
     id("convention.publication")
+    id("java-library")
     id("org.jetbrains.dokka")
-    alias(libs.plugins.kotlinJvm)
 }
 
 group = "io.github.sakurajimamaii"
-version = "1.3.5"
+version = "1.3.10"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -33,10 +48,13 @@ kotlin.sourceSets.all {
 }
 
 dependencies {
+    compileOnly(libs.gson)
+    compileOnly(libs.jackson.databind)
     implementation(libs.fastjson2)
-    implementation(libs.gson)
-    implementation(libs.jackson.databind)
     implementation(projects.libraries.kernel)
+    testImplementation(libs.fastjson2)
+    testImplementation(libs.gson)
+    testImplementation(libs.jackson.databind)
     testImplementation(libs.junit)
 }
 
@@ -52,7 +70,7 @@ if (mavenPropertiesFile.exists()) {
             register<MavenPublication>("release") {
                 groupId = "io.github.sakurajimamaii"
                 artifactId = "log-core"
-                version = "1.3.5"
+                version = "1.3.10"
 
                 afterEvaluate {
                     from(components["java"])

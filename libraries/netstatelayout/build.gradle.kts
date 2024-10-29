@@ -18,8 +18,8 @@ import java.net.URL
  */
 
 plugins {
+    kotlin("android")
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
     id("convention.publication")
     id("org.jetbrains.dokka")
 }

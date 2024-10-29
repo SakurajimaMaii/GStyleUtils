@@ -28,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.graphics.drawable.IconCompat
-import com.ave.vastgui.appcompose.MainActivity
+import com.ave.vastgui.appcompose.ui.MainActivity
 import com.ave.vastgui.appcompose.R
 import com.ave.vastgui.tools.utils.shortcut.createPinnedShortcut
 import com.ave.vastgui.tools.utils.shortcut.setDynamicShortcuts

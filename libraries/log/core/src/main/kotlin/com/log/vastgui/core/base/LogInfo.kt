@@ -16,6 +16,9 @@
 
 package com.log.vastgui.core.base
 
+import com.alibaba.fastjson2.JSON
+import com.alibaba.fastjson2.JSONWriter
+import com.alibaba.fastjson2.annotation.JSONField
 import com.log.vastgui.core.annotation.LogApi
 
 // Author: Vast Gui
@@ -23,82 +26,55 @@ import com.log.vastgui.core.annotation.LogApi
 // Date: 2023/8/28
 
 /**
- * The content representing [mContent] is text.
- *
- * @since 1.3.1
- */
-const val TEXT_TYPE = 0x01
-
-/**
- * The content representing [mContent] is json.
- *
- * @since 1.3.1
- */
-const val JSON_TYPE = 0x02
-
-/**
  * Log information.
  *
- * @property mThreadName The name of the current thread.
- * @property mStackTrace an array of stack trace elements representing the
+ * @property threadName The name of the current thread.
+ * @property stackTrace an array of stack trace elements representing the
  *     stack dump of LogInfo.
- * @property mLevel The level of the log.
- * @property mTag Used to identify the source of a log message. It usually
+ * @property level The level of the log.
+ * @property tag Used to identify the source of a log message. It usually
  *     identifies the class or activity where the log call occurs.
- * @property mContent The message you would like logged.
- * @property mType Please refer to [TEXT_TYPE] or [JSON_TYPE].
- * @property mTime The current time in milliseconds, only initialized when
+ * @property content The message you would like logged.
+ * @property time The current time in milliseconds, only initialized when
  *     the object is created.
  * @since 0.5.2
  */
-class LogInfo @LogApi constructor(
-    val mThreadName: String,
-    val mStackTrace: StackTraceElement?,
-    val mLevel: LogLevel,
-    val mTag: String,
-    val mTime: Long,
-    val mContent: String,
-    val mType: Int,
-    val mThrowable: Throwable? = null
+data class LogInfo @LogApi constructor(
+    val threadName: String,
+    @JSONField(serialize = false)
+    val stackTrace: StackTraceElement?,
+    val level: LogLevel,
+    val tag: String,
+    val time: Long,
+    val content: String,
+    val throwable: Throwable? = null
 ) {
-    val mTraceLength = mStackTrace.toString().length
 
-    val mPrintLength = mTraceLength.coerceAtLeast(mContent.length)
+    @JSONField(serialize = false)
+    val traceLength = stackTrace.toString().length
 
-    val mPrintBytesLength = (if (mTraceLength >= mContent.length) mStackTrace.toString()
-        .toByteArray().size else mContent.toByteArray().size).coerceAtLeast(50)
+    @JSONField(serialize = false)
+    val printLength = traceLength.coerceAtLeast(content.length)
 
-    val mLevelPriority: Int = mLevel.priority
+    @JSONField(serialize = false)
+    val printBytesLength = (if (traceLength >= content.length) stackTrace.toString()
+        .toByteArray().size else content.toByteArray().size).coerceAtLeast(50)
+
+    @JSONField(serialize = false)
+    val levelPriority: Int = level.priority
 
     /** @since 1.3.4 */
-    val fileName = mStackTrace?.fileName ?: ""
+    val fileName = stackTrace?.fileName ?: ""
 
     /** @since 1.3.4 */
-    val methodName = mStackTrace?.methodName ?: ""
+    val methodName = stackTrace?.methodName ?: ""
 
     /** @since 1.3.4 */
-    val lineNumber = mStackTrace?.lineNumber ?: 0
+    val lineNumber = stackTrace?.lineNumber ?: 0
 
-    /** @since 0.5.3 */
-    override fun toString(): String {
-        return """
-            (Level:$mLevel 
-            Tag:$mTag
-            Time:$mTime
-            ThreadName:$mThreadName
-            StackTrace:$mStackTrace
-            Content:$mContent
-            Exception:${mThrowable?.stackTraceToString()})
-            """.trimIndent()
-    }
+    /** @since 1.3.8 */
+    val className = stackTrace?.className ?: "unknown class"
 
-}
+    override fun toString(): String = JSON.toJSONString(this, JSONWriter.Context(JSONWriter.Feature.PrettyFormat))
 
-/**
- * [getStackOffset] .
- *
- * @since 1.3.4
- */
-internal inline fun <reified T> getStackOffset(trace: Array<StackTraceElement>): Int {
-    return trace.indexOfLast { it.className == T::class.java.name }.coerceAtLeast(0)
 }

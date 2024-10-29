@@ -1,8 +1,8 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 
 plugins {
+    kotlin("android")
     id("com.android.application")
-    id("kotlin-android")
 }
 
 android {

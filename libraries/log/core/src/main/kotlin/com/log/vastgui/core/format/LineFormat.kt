@@ -29,11 +29,11 @@ import com.log.vastgui.core.base.LogInfo
  * Line format of [LogInfo].
  *
  * @see <img
- *     src=https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/log/core/image/line_format.png?raw=true/>
+ * src=https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/log/core/image/line_format.png?raw=true/>
  * @since 1.3.4
  */
 object LineFormat : LogFormat {
     override fun format(logInfo: LogInfo): String = logInfo.let {
-        "${timeSdf.format(it.mTime)} [${it.mLevel}|${it.mTag}|${it.mThreadName}] (${it.mStackTrace?.fileName}:${it.mStackTrace?.lineNumber}) ${it.mContent}"
+        "${timeSdf.format(it.time)} [${it.level}|${it.tag}|${it.threadName}] (${it.stackTrace?.fileName}:${it.stackTrace?.lineNumber}) ${it.content}"
     }
 }

@@ -18,10 +18,10 @@ import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import java.net.URL
 
 plugins {
-    id(libs.plugins.androidLibrary.get().pluginId)
+    kotlin("android")
+    id("com.android.library")
     id("convention.publication")
     id("org.jetbrains.dokka")
-    alias(libs.plugins.kotlinAndroid)
 }
 
 android {
@@ -72,10 +72,10 @@ kotlin.sourceSets.all {
 dependencies {
     compileOnly(projects.libraries.kernel)
     compileOnly(projects.libraries.log.core)
-    implementation(libs.core.ktx)
-    testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+    implementation(libs.core.ktx)
+    testImplementation(libs.junit)
 }
 
 extra["PUBLISH_ARTIFACT_ID"] = "log-mars"
@@ -90,7 +90,7 @@ if (mavenPropertiesFile.exists()) {
             register<MavenPublication>("release") {
                 groupId = "io.github.sakurajimamaii"
                 artifactId = "log-mars"
-                version = "1.3.5"
+                version = "1.3.6"
 
                 afterEvaluate {
                     from(components["release"])

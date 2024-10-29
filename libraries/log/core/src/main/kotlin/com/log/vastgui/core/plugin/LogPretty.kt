@@ -44,11 +44,16 @@ import kotlin.properties.Delegates
  *
  * @since 1.3.4
  */
-class LogPretty private constructor(private val mConfiguration: Configuration) {
+class LogPretty private constructor(mConfiguration: Configuration) {
+
+    private val mConverter: Converter = mConfiguration.converter
 
     class Configuration internal constructor() {
         var converter: Converter by Delegates.notNull()
     }
+
+    /** @since 1.3.8 */
+    private fun parseString(json: String): Any = mConverter.parseString(json)
 
     companion object : LogPlugin<Configuration, LogPretty> {
 
@@ -59,8 +64,7 @@ class LogPretty private constructor(private val mConfiguration: Configuration) {
                 val rawContent = subject.getStringContent()
                 // Try to render the log content and return the
                 // original content if an exception occurs.
-                val content = plugin.mConfiguration
-                    .converter.parseString(rawContent)
+                val content = plugin.parseString(rawContent)
                 subject.setStringContent(content.toString())
                 proceedWith(subject)
             }

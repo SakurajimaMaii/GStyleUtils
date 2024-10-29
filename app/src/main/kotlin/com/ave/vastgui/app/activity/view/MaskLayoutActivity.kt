@@ -44,7 +44,7 @@ import org.alee.component.skin.service.ThemeSkinService
 // Date: 2023/9/25
 
 /** [MaskLayoutActivity]. */
-@androidx.annotation.OptIn(ExperimentalView::class)
+@OptIn(ExperimentalView::class)
 class MaskLayoutActivity : AppCompatActivity(R.layout.activity_mask_layout),
     MaskLayout.MaskAnimationListener {
 

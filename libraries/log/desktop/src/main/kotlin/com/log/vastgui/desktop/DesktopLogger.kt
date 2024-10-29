@@ -24,10 +24,12 @@ import com.log.vastgui.desktop.format.LineColorfulFormat
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
 // Date: 2024/5/14 23:04
-// Documentation: https://ave.entropy2020.cn/documents/log/log-desktop/logger/
+// Documentation: https://ave.entropy2020.cn/documents/log/log-desktop/usage/
 
 /**
  * Desktop logger.
+ *
+ * @param logFormat Used to set the log style.
  *
  * ```kotlin
  * val logFactory: LogFactory = getLogFactory {
@@ -38,8 +40,6 @@ import com.log.vastgui.desktop.format.LineColorfulFormat
  * }
  * ```
  *
- * @see <img
- * src="https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/log/desktop/image/log.png?raw=true"/>
  * @since 1.3.1
  */
 fun Logger.Companion.desktop(logFormat: LogFormat = LineColorfulFormat): DesktopLogger =

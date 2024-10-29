@@ -18,15 +18,16 @@ package com.ave.vastgui.tools.log
 
 import android.util.Log
 import com.ave.vastgui.tools.log.base.LogScope
+import com.ave.vastgui.tools.log.base.LogScope.ExceptionLog
 import com.log.vastgui.core.base.LogFormat
 import com.log.vastgui.core.base.LogInfo
+import com.log.vastgui.core.base.LogLevel
 import com.log.vastgui.core.base.Logger
 import com.log.vastgui.core.format.DEFAULT_MAX_PRINT_TIMES
 import com.log.vastgui.core.format.DEFAULT_MAX_SINGLE_LOG_LENGTH
 import com.log.vastgui.core.format.TableFormat
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
@@ -46,13 +47,13 @@ import kotlin.coroutines.CoroutineContext
  * ```
  *
  * @param maxSingleLogLength The max length of single line of log. every
- *     char in line is calculated as 4 bytes.
+ * char in line is calculated as 4 bytes.
  * @param maxPrintTimes The total repeat number of prints. For example, the
- *     log content is divided into ten lines depending on
- *     maxSingleLogLength. If you set maxPrintTimes to 5, only the first
- *     five lines will be printed.
+ * log content is divided into ten lines depending on maxSingleLogLength.
+ * If you set maxPrintTimes to 5, only the first five lines will be
+ * printed.
  * @see <img
- *     src="https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/tools/image/log.png?raw=true">
+ * src="https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/tools/image/log.png?raw=true">
  * @since 1.3.1
  */
 fun Logger.Companion.android(
@@ -82,20 +83,19 @@ class AndroidLogger internal constructor(
         mLogScope.launch { mLogChannel.send(logInfo) }
     }
 
-    override fun handleCoroutineExceptionHandler(context: CoroutineContext, exception: Throwable) {
-        Log.e(TAG, "$TAG encounter exception.", exception)
-    }
-
     init {
         mLogScope.launch {
             while (isActive) {
-                runCatching {
-                    val logInfo = mLogChannel.receive()
-                    Log.println(logInfo.mLevelPriority, logInfo.mTag, logFormat.format(logInfo))
-                }.onFailure {
-                    Log.e(TAG, "$TAG:${it.stackTraceToString()}", it)
-                }
+                val info = mLogChannel.receive()
+                Log.println(info.levelPriority, info.tag, logFormat.format(info))
             }
+        }
+
+        exceptionLog = ExceptionLog { _, exception ->
+            val threadName = Thread.currentThread().name
+            val info = LogInfo(threadName, exception.stackTrace[0], LogLevel.ERROR, TAG,
+                System.currentTimeMillis(), exception.stackTraceToString(), exception)
+            Log.println(info.levelPriority, info.tag, logFormat.format(info))
         }
     }
 

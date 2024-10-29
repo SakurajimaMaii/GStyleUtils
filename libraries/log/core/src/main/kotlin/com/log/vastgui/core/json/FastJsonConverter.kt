@@ -32,13 +32,16 @@ import com.ave.vastgui.core.extension.SingletonHolder
  */
 class FastJsonConverter private constructor(override val isPretty: Boolean) : Converter {
 
-    override fun toJson(data: Any): String = if (isPretty) {
-        JSON.toJSONString(data, JSONWriter.Context(JSONWriter.Feature.PrettyFormat))
-    } else {
-        JSON.toJSONString(data)
-    }
+    override fun toJson(data: Any): String = runCatching {
+        if (isPretty) {
+            JSON.toJSONString(data, JSONWriter.Context(JSONWriter.Feature.PrettyFormat))
+        } else {
+            JSON.toJSONString(data)
+        }
+    }.getOrDefault(data.toString())
 
     override fun parseString(jsonString: String): String = runCatching {
+        if (!JSON.isValidObject(jsonString)) return@runCatching jsonString
         toJson(JSON.parseObject(jsonString))
     }.getOrDefault(jsonString)
 

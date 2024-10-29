@@ -19,7 +19,7 @@ import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    alias(libs.plugins.kotlinJvm)
+    kotlin("jvm")
     id("org.jetbrains.dokka")
 }
 
@@ -28,7 +28,6 @@ subprojects {
 
     tasks.withType<DokkaTaskPartial>().configureEach {
         dokkaSourceSets.configureEach {
-            notCompatibleWithConfigurationCache("https://github.com/Kotlin/dokka/issues/1217")
             jdkVersion.set(17)
             languageVersion.set("1.9.20")
             suppressInheritedMembers.set(true)

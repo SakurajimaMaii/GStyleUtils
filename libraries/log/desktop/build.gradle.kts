@@ -16,18 +16,17 @@
 
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.net.URL
 
 plugins {
-    id("java-library")
+    kotlin("jvm")
     id("convention.publication")
-    alias(libs.plugins.kotlinJvm)
+    id("java-library")
 }
 
 group = "io.github.sakurajimamaii"
-version = "1.3.5"
+version = "1.3.7"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -55,6 +54,8 @@ dependencies {
     testImplementation(libs.gson)
     testImplementation(libs.jackson.databind)
     testImplementation(libs.junit)
+    testImplementation(projects.libraries.kernel)
+    testImplementation(projects.libraries.log.core)
 }
 
 extra["PUBLISH_ARTIFACT_ID"] = "log-desktop"
@@ -68,7 +69,7 @@ if (mavenPropertiesFile.exists()) {
             register<MavenPublication>("release") {
                 groupId = "io.github.sakurajimamaii"
                 artifactId = "log-desktop"
-                version = "1.3.5"
+                version = "1.3.7"
 
                 afterEvaluate {
                     from(components["java"])

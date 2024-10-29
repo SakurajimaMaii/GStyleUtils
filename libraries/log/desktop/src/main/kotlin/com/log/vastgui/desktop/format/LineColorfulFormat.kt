@@ -37,21 +37,23 @@ import com.log.vastgui.desktop.base.Yellow
 /**
  * Line format with colorful style.
  *
+ * @see <img
+ * src=https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/log/desktop/image/log.png?raw=true/>
  * @since 1.3.4
  */
 object LineColorfulFormat : LogFormat {
 
     override fun format(logInfo: LogInfo): String {
-        val time = timeSdf.format(logInfo.mTime)
-        return "$Cyan$time$Reset ${logInfo.headColor()}[${logInfo.mLevel}|${logInfo.mTag}|${logInfo.mThreadName}]$Reset $Blue(${logInfo.mStackTrace?.fileName}:${logInfo.mStackTrace?.lineNumber})$Reset ${logInfo.mContent}"
+        val time = timeSdf.format(logInfo.time)
+        return "$Cyan$time$Reset ${logInfo.headColor()}[${logInfo.level}|${logInfo.tag}|${logInfo.threadName}]$Reset $Blue(${logInfo.stackTrace?.fileName}:${logInfo.stackTrace?.lineNumber})$Reset ${logInfo.content}"
     }
 
     /**
-     * Get the head color by [LogInfo.mLevel].
+     * Get the head color by [LogInfo.level].
      *
      * @since 1.3.4
      */
-    private fun LogInfo.headColor() = when (mLevel) {
+    private fun LogInfo.headColor() = when (level) {
         LogLevel.VERBOSE -> Gray
         LogLevel.DEBUG -> Blue
         LogLevel.INFO -> Green

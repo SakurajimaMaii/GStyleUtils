@@ -21,10 +21,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.net.URL
 
 plugins {
-    id("java-library")
+    kotlin("jvm")
     id("convention.publication")
+    id("java-library")
     id("org.jetbrains.dokka")
-    alias(libs.plugins.kotlinJvm)
 }
 
 group = "io.github.sakurajimamaii"
@@ -72,6 +72,7 @@ if (mavenPropertiesFile.exists()) {
 
 tasks.withType<DokkaTaskPartial> {
     dokkaSourceSets.configureEach {
+        moduleName.set("core")
         sourceLink {
             localDirectory.set(projectDir.resolve("src"))
             remoteUrl.set(URL("https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/core/src"))
