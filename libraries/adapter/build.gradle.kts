@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import org.jetbrains.dokka.gradle.DokkaTaskPartial
-import java.net.URL
+import java.net.URI
 
 plugins {
     kotlin("kapt")
@@ -97,11 +96,11 @@ if (mavenPropertiesFile.exists()) {
     }
 }
 
-tasks.withType<DokkaTaskPartial> {
+dokka {
     dokkaSourceSets.configureEach {
         sourceLink {
             localDirectory.set(projectDir.resolve("src"))
-            remoteUrl.set(URL("https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/adapter/src"))
+            remoteUrl.set(URI("https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/adapter/src"))
             remoteLineSuffix.set("#L")
         }
     }

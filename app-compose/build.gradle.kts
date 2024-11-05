@@ -18,7 +18,8 @@ plugins {
     kotlin("android")
     kotlin("plugin.serialization")
     id("com.android.application")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {

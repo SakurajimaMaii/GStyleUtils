@@ -22,6 +22,7 @@ includeBuild("convention-plugins")
 rootProject.name = "Android-Vast-Extension"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
 
 // =======
 // = Lib =

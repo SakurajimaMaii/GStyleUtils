@@ -14,35 +14,43 @@
  * limitations under the License.
  */
 
-import org.jetbrains.dokka.DokkaConfiguration
-import org.jetbrains.dokka.gradle.DokkaTaskPartial
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
 
 plugins {
     kotlin("jvm")
     id("org.jetbrains.dokka")
 }
 
-subprojects {
-    apply(plugin = "org.jetbrains.dokka")
-
-    tasks.withType<DokkaTaskPartial>().configureEach {
-        dokkaSourceSets.configureEach {
-            jdkVersion.set(17)
-            languageVersion.set("1.9.20")
-            suppressInheritedMembers.set(true)
-            documentedVisibilities.set(
-                setOf(
-                    DokkaConfiguration.Visibility.PUBLIC,
-                    DokkaConfiguration.Visibility.PROTECTED,
-                    DokkaConfiguration.Visibility.PRIVATE,
-                    DokkaConfiguration.Visibility.INTERNAL
-                )
-            )
-        }
-    }
-}
-
-tasks.dokkaHtmlMultiModule {
+dokka {
     moduleName.set("Android-Vast-Extension")
+    // FIXME java.lang.OutOfMemoryError: Java heap space
+    // https://github.com/Kotlin/dokka/issues/3885
+    dokkaGeneratorIsolation = ClassLoaderIsolation()
+    dokkaSourceSets.configureEach {
+        jdkVersion.set(17)
+        languageVersion.set("2.0.21")
+        documentedVisibilities.set(
+            setOf(
+                VisibilityModifier.Public,
+                VisibilityModifier.Protected,
+                VisibilityModifier.Private,
+                VisibilityModifier.Internal,
+            )
+        )
+    }
+
+    // Update documentation aggregation in multi-module projects
+    // https://kotlinlang.org/docs/dokka-migration.html#update-documentation-aggregation-in-multi-module-projects
+    dependencies {
+        dokka(projects.libraries.adapter)
+        dokka(projects.libraries.kernel)
+        dokka(projects.libraries.log.android)
+        dokka(projects.libraries.log.core)
+        dokka(projects.libraries.log.desktop)
+        dokka(projects.libraries.log.mars)
+        dokka(projects.libraries.log.okhttp)
+        dokka(projects.libraries.log.slf4j)
+        dokka(projects.libraries.netstatelayout)
+        dokka(projects.libraries.tools)
+    }
 }

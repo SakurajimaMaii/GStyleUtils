@@ -1,5 +1,5 @@
-import org.jetbrains.dokka.gradle.DokkaTaskPartial
-import java.net.URL
+
+import java.net.URI
 
 /*
  * Copyright 2024 VastGui guihy2019@gmail.com
@@ -93,11 +93,11 @@ if (mavenPropertiesFile.exists()) {
     }
 }
 
-tasks.withType<DokkaTaskPartial> {
+dokka {
     dokkaSourceSets.configureEach {
         sourceLink {
             localDirectory.set(projectDir.resolve("src"))
-            remoteUrl.set(URL("https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/netstatelayout/src"))
+            remoteUrl.set(URI("https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/netstatelayout/src"))
             remoteLineSuffix.set("#L")
         }
     }
