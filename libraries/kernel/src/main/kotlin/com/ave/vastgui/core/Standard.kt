@@ -28,10 +28,25 @@ import kotlin.contracts.contract
  * Calls the specified function [block] with not null receiver and returns
  * null.
  *
+ * ```kotlin
+ * resource = resource.letThenNull {
+ *     ... // Do something with non-null resource
+ * }
+ * ```
+ *
+ * The code above is equivalent to the following example:
+ *
+ * ```kotlin
+ * if (null != resource) {
+ *     ... // Do something with non-null resource
+ *     resource = null
+ * }
+ * ```
+ *
  * @since 0.1.2
  */
 @OptIn(ExperimentalContracts::class)
-inline fun <T> T?.letThenNull(crossinline block: (T) -> Unit): T? {
+inline fun <T> T?.letThenNull(crossinline block: (T) -> Unit): Nothing? {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }

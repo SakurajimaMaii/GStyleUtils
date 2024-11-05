@@ -21,9 +21,6 @@ import kotlin.test.Test
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
 // Date: 2024/10/29
-// Description: 
-// Documentation:
-// Reference: 
 
 class StandardTest {
 
