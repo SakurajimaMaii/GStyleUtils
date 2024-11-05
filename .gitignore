@@ -43,3 +43,5 @@ libraries/*/build
 skin/darkskin/build
 
 *.jar
+
+.kotlin
