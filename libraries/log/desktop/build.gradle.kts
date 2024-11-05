@@ -16,21 +16,28 @@
 
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.net.URL
 
 plugins {
-    id("java-library")
+    kotlin("jvm")
     id("convention.publication")
-    alias(libs.plugins.kotlinJvm)
+    id("java-library")
 }
 
 group = "io.github.sakurajimamaii"
-version = "1.3.4"
+version = "1.3.7"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
     withSourcesJar()
+}
+
+tasks.named<KotlinJvmCompile>("compileKotlin") {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
 }
 
 sourceSets["main"].java.srcDir("src/main/kotlin")
@@ -39,19 +46,16 @@ kotlin.sourceSets.all {
     languageSettings.optIn("com.log.vastgui.core.annotation.LogApi")
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
-    }
-}
-
 dependencies {
-    implementation(libs.log.core)
-    testImplementation(libs.junit)
-    testImplementation(libs.gson)
-    testImplementation(libs.fastjson2.kotlin)
-    testImplementation(libs.jackson.databind)
+    compileOnly(projects.libraries.kernel)
+    compileOnly(projects.libraries.log.core)
     testImplementation(libs.fastjson2)
+    testImplementation(libs.fastjson2.kotlin)
+    testImplementation(libs.gson)
+    testImplementation(libs.jackson.databind)
+    testImplementation(libs.junit)
+    testImplementation(projects.libraries.kernel)
+    testImplementation(projects.libraries.log.core)
 }
 
 extra["PUBLISH_ARTIFACT_ID"] = "log-desktop"
@@ -65,7 +69,7 @@ if (mavenPropertiesFile.exists()) {
             register<MavenPublication>("release") {
                 groupId = "io.github.sakurajimamaii"
                 artifactId = "log-desktop"
-                version = "1.3.4"
+                version = "1.3.7"
 
                 afterEvaluate {
                     from(components["java"])

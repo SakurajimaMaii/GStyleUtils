@@ -53,7 +53,7 @@ object FileMgr {
 
     /**
      * @return The File which from internal storage, meant for your app's use
-     *     only.
+     * only.
      * @see [Context.getFilesDir]
      */
     @JvmStatic
@@ -61,7 +61,7 @@ object FileMgr {
 
     /**
      * @return The File which from internal storage, meant for your app's use
-     *     only.
+     * only.
      * @see [Context.getCacheDir]
      */
     @JvmStatic
@@ -69,8 +69,8 @@ object FileMgr {
 
     /**
      * @return The File which from external storage, meant for your app's use
-     *     only. Throw IllegalStateException if shared storage is not currently
-     *     available.
+     * only. Throw IllegalStateException if shared storage is not currently
+     * available.
      * @throws IllegalStateException
      * @see [Context.getExternalFilesDir]
      */
@@ -83,8 +83,8 @@ object FileMgr {
 
     /**
      * @return The File which from external storage, meant for your app's use
-     *     only. Throw IllegalStateException if shared storage is not currently
-     *     available.
+     * only. Throw IllegalStateException if shared storage is not currently
+     * available.
      * @see [Context.getExternalCacheDir]
      */
     @JvmStatic
@@ -110,6 +110,7 @@ object FileMgr {
      * @param file The file you want to save.
      */
     @JvmStatic
+    @Deprecated("Using getOrSaveFile instead.", ReplaceWith("getOrSaveFile(dirs)"))
     fun saveFile(file: File): ResultCompat<String> = try {
         if (file.createNewFile()) {
             ResultCompat.success("${file.name} saved successfully")
@@ -118,6 +119,23 @@ object FileMgr {
         }
     } catch (e: IOException) {
         ResultCompat.failure(e)
+    }
+
+    /**
+     * If the [file] exists, get it directly, otherwise try to create it and
+     * get it.
+     *
+     * @since 1.5.1
+     */
+    @JvmStatic
+    fun getOrSaveFile(file: File): ResultCompat<File> = try {
+        if (file.exists() || file.createNewFile()) {
+            ResultCompat.success(file)
+        } else {
+            ResultCompat.failure(RuntimeException("${file.name} doesn't exist and failed to create."))
+        }
+    } catch (e: Exception) {
+        ResultCompat.failure(Exception("Failed to get ${file.name}."))
     }
 
     /**
@@ -176,7 +194,7 @@ object FileMgr {
      *
      * @param file File to be moved.
      * @param destination File move destination path. For example:
-     *     appInternalFilesDir().path.
+     * appInternalFilesDir().path.
      * @since 0.4.0
      */
     @JvmStatic
@@ -208,6 +226,7 @@ object FileMgr {
      * @param dir The file of the directory.
      */
     @JvmStatic
+    @Deprecated("Using getOrMakeDir instead.", ReplaceWith("getOrMakeDir(dirs)"))
     fun makeDir(dir: File): ResultCompat<String> = when {
         dir.exists() ->
             ResultCompat.failure(IllegalArgumentException("${dir.name} is already exists."))
@@ -220,13 +239,13 @@ object FileMgr {
     }
 
     /**
-     * Creates the directory named by this abstract pathname, including any necessary but
-     * nonexistent parent directories.
+     * Creates the directory named by this abstract pathname, including any
+     * necessary but nonexistent parent directories.
      *
      * @since 1.5.0
-     * @see File.mkdirs
      */
     @JvmStatic
+    @Deprecated("Using getOrMakeDir instead.", ReplaceWith("getOrMakeDir(dirs)"))
     fun makeDirs(dirs: File): ResultCompat<String> = when {
         dirs.exists() ->
             ResultCompat.failure(IllegalArgumentException("${dirs.name} is already exists."))
@@ -236,6 +255,26 @@ object FileMgr {
 
         else ->
             ResultCompat.failure(RuntimeException("${dirs.name} create failed."))
+    }
+
+    /**
+     * If the [dir] exists, get it directly, otherwise Create the directory
+     * named by this abstract pathname, including any necessary but nonexistent
+     * parent directories.
+     *
+     * @since 1.5.1
+     */
+    @JvmStatic
+    fun getOrMakeDir(dir: File): ResultCompat<File> = when {
+        dir.exists() && dir.isDirectory -> ResultCompat.success(dir)
+
+        dir.exists() && !dir.isDirectory ->
+            ResultCompat.failure(IllegalArgumentException("${dir.name} is not a directory."))
+
+        dir.mkdirs() -> ResultCompat.success(dir)
+
+        else -> ResultCompat
+            .failure(RuntimeException("${dir.name} doesn't exist and failed to create."))
     }
 
     /**
@@ -455,7 +494,7 @@ object FileMgr {
      * ```
      *
      * @param authority The authority of a [FileProvider] defined in a
-     *     <provider> element in your app's manifest.
+     * <provider> element in your app's manifest.
      * @since 0.5.0
      */
     @JvmStatic

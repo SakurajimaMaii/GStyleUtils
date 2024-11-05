@@ -29,7 +29,7 @@ import com.ave.vastgui.tools.activity.widget.screenConfig
 
 class LogActivity : VastVbVmActivity<ActivityLogBinding, SharedVM>() {
 
-    private val logger = mLogFactory.getLogCat(LogActivity::class.java)
+    private val logger = logFactory.getLogCat(LogActivity::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

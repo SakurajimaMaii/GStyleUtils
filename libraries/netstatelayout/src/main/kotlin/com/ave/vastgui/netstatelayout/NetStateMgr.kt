@@ -27,7 +27,7 @@ import com.ave.vastgui.netstatelayout.listener.OnNetErrorListener
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
 // Date: 2021/11/16
-// Documentation: https://ave.entropy2020.cn/documents/VastNetStateLayout/usage/
+// Documentation: https://ave.entropy2020.cn/documents/net-state-layout/usage/
 
 /**
  * [NetStateMgr] used to manage the page of different states.

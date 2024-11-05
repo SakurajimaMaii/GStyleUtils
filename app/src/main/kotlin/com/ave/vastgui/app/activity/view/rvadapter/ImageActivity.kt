@@ -32,7 +32,7 @@ import com.ave.vastgui.app.adapter.entity.Images
 import com.ave.vastgui.app.adapter.holder.ComicImageHolder
 import com.ave.vastgui.app.adapter.holder.DefaultImageHolder
 import com.ave.vastgui.app.databinding.ActivityImageBinding
-import com.ave.vastgui.app.log.mLogFactory
+import com.ave.vastgui.app.log.logFactory
 import com.ave.vastgui.app.net.OpenApi
 import com.ave.vastgui.app.net.OpenApiService
 import com.ave.vastgui.app.viewmodel.NetVM
@@ -67,7 +67,7 @@ private class ImagePagingAdapter(context: Context) : BasePagingAdapter<Images.Im
 
 class ImageActivity : VastVbVmActivity<ActivityImageBinding, NetVM>() {
 
-    private val logcat = mLogFactory.getLogCat(this::class.java)
+    private val logcat = logFactory.getLogCat(this::class.java)
 
     private val mImageAdapter: ImageAdapter by lazy {
         ImageAdapter(this)

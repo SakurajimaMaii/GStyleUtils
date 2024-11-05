@@ -25,7 +25,7 @@ import com.log.vastgui.core.plugin.LogTypeValidator
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
 // Date: 2023/7/5
-// Documentation: https://ave.entropy2020.cn/documents/log/log-core/description/
+// Documentation: https://ave.entropy2020.cn/documents/log/log-core/setting-up/
 
 /**
  * Get log factory
@@ -82,28 +82,67 @@ class LogFactory internal constructor() {
      *
      * @since 1.3.4
      */
-    fun getLogCat(clazz: Class<*>) = LogCat().also {
-        it.mDefaultTag = clazz.simpleName
-        install(it)
-    }
+    @Deprecated(
+        "The clazz parameter is passed in just to get the class name as the default log " +
+                "tag, but this may cause misunderstanding for some users, so this API is marked as " +
+                "deprecated at the WARNING level.",
+        ReplaceWith("invoke(clazz.simpleName)"),
+        DeprecationLevel.WARNING
+    )
+    fun getLogCat(clazz: Class<*>) =
+        LogCat(clazz.simpleName).apply(::install)
 
     /**
      * Get log with [tag].
      *
      * @since 1.3.4
      */
-    fun getLogCat(tag: String) = LogCat().also {
-        it.mDefaultTag = tag
-        install(it)
-    }
+    @Deprecated("Use invoke instead.", ReplaceWith("invoke(tag)"))
+    fun getLogCat(tag: String = ""): LogCat =
+        LogCat(tag).apply(::install)
 
     /**
-     * Install the plugin to [logUtil].
+     * Install the plugin to [logcat].
      *
      * @since 0.5.2
      */
-    private fun install(logUtil: LogCat) {
-        plugins.values.forEach { logUtil.apply(it) }
+    private fun install(logcat: LogCat) {
+        plugins.values.forEach { logcat.apply(it) }
     }
+
+    /**
+     * ```kt
+     * val logFactory: LogFactory = getLogFactory {
+     *     ....
+     * }
+     *
+     * val logcat: LogCat = logFactory("OpenApi")
+     * ```
+     *
+     * @since 1.3.5
+     */
+    operator fun invoke(tag: String = ""): LogCat = getLogCat(tag)
+
+    /**
+     * Use the class name of [clazz] as the tag of the log.
+     *
+     * ```kt
+     * val logFactory: LogFactory = getLogFactory {
+     *     ....
+     * }
+     *
+     * val logcat: LogCat = logFactory(OpenApi::class.java)
+     * ```
+     *
+     * @since 1.3.5
+     */
+    @Deprecated(
+        "The clazz parameter is passed in just to get the class name as the default log " +
+                "tag, but this may cause misunderstanding for some users, so this API is marked as " +
+                "deprecated at the WARNING level.",
+        ReplaceWith("invoke(clazz.simpleName)"),
+        DeprecationLevel.WARNING
+    )
+    operator fun invoke(clazz: Class<*>): LogCat = getLogCat(clazz.simpleName)
 
 }

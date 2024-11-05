@@ -19,7 +19,6 @@ package com.log.vastgui.core.json
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
 // Date: 2023/8/29
-// Documentation: https://ave.entropy2020.cn/documents/log/log-core/description/
 
 /**
  * Converter

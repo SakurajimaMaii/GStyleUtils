@@ -19,8 +19,8 @@ package com.ave.vastgui.app.activity.view
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.ave.vastgui.app.R
-import com.ave.vastgui.app.log.mLogFactory
 import com.ave.vastgui.app.databinding.ActivityRatingBinding
+import com.ave.vastgui.app.log.logFactory
 import com.ave.vastgui.tools.utils.AppUtils
 import com.ave.vastgui.tools.utils.DensityUtils.DP
 import com.ave.vastgui.tools.view.extension.refreshWithInvalidate
@@ -36,7 +36,7 @@ import com.ave.vastgui.tools.viewbinding.viewBinding
 class RatingActivity : AppCompatActivity(R.layout.activity_rating) {
 
     private val mBinding by viewBinding(ActivityRatingBinding::bind)
-    private val mLogger = mLogFactory.getLogCat(RatingActivity::class.java)
+    private val mLogger = logFactory(RatingActivity::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

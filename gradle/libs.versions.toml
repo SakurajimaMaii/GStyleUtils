@@ -1,45 +1,46 @@
 [versions]
-activity-ktx = "1.9.1"
-agp = "8.6.0-rc01"
+activity-ktx = "1.9.3"
 androidx-junit = "1.2.1"
-androidx-startup = "1.1.1"
-annotation = "1.8.2"
+androidx-startup = "1.2.0"
+annotation = "1.9.0"
 appcompat = "1.7.0"
 coil = "2.6.0"
 coil-compose = "2.5.0"
 compileSdk = "34"
-compose = "1.7.0-rc01"
+compose = "1.7.4"
 constraintlayout = "2.1.4"
 converter-gson = "2.11.0"
 core-ktx = "1.13.1"
 core-runtime = "2.2.0"
 core-splashscreen = "1.0.1"
 datastore-preferences = "1.1.1"
+desugar_jdk_libs = "2.1.2"
 dialogx = "0.0.49"
 dokka = "1.9.20"
 espresso-core = "3.6.1"
 exifinterface = "1.3.7"
 fastjson2 = "2.0.51.android5"
 fastjson2Kotlin = "2.0.51"
-fragment-ktx = "1.8.2"
-gradle = "8.5.2"
+fragment-ktx = "1.8.4"
+gradle = "8.6.1"
 gson = "2.11.0"
-jackson-databind = "2.17.1"
+hutool = "5.8.25"
+jackson-databind = "2.17.2"
 junit = "4.13.2"
-kotlin = "2.0.20"
+kotlin = "1.9.20"
 kotlin-reflect = "2.0.0"
 kotlinx-coroutines-android = "1.8.1"
-kotlinx-coroutines-core = "1.8.1"
+kotlinx-coroutines-core = "1.9.0-RC.2"
 kotlinx-datetime = "0.6.0"
 kotlinx-serialization-json = "1.6.3"
-ksp = "2.0.20-1.0.24"
-lifecycle = "2.8.4"
-log = "1.3.4"
+kotlinxCoroutinesTest = "1.9.0-RC"
+ksp = "1.9.20-1.0.14"
+lifecycle = "2.8.6"
 material = "1.12.0"
-material3-compose = "1.3.0-beta04"
+material3-compose = "1.3.0"
 minSdk = "21"
 monitor = "1.7.2"
-navigationFragment = "2.7.7"
+navigationFragment = "2.8.1"
 okhttp = "4.12.0"
 paging-compose = "3.3.2"
 paging-runtime = "3.3.2"
@@ -48,19 +49,18 @@ recyclerview = "1.3.2"
 reflex = "2.0.4"
 retrofit = "2.11.0"
 security-crypto = "1.1.0-alpha06"
+slf4j = "2.0.16"
 swiperefreshlayout = "1.2.0-alpha01"
 targetSdk = "34"
-tools = "1.5.0"
-core = "0.1.1"
-vastnetstatelayout = "1.1.1"
 versionedparcelable = "1.2.0"
 zxing = "3.5.3"
+ktor = "3.0.0-beta-2"
 
 [libraries]
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-ktx" }
 activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity-ktx" }
 adapter-rxjava3 = { module = "com.squareup.retrofit2:adapter-rxjava3", version.ref = "converter-gson" }
-android-documentation-plugin = { module = "org.jetbrains.dokka:android-documentation-plugin", version.ref = "dokka" }
+androidx-core = { module = "androidx.core:core", version.ref = "core-ktx" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-junit" }
 androidx-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
@@ -78,6 +78,7 @@ core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 core-runtime = { module = "androidx.arch.core:core-runtime", version.ref = "core-runtime" }
 core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "core-splashscreen" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore-preferences" }
+desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 dialogx = { module = "com.kongzue.dialogx:DialogX", version.ref = "dialogx" }
 dialogxiosstyle = { module = "com.kongzue.dialogx.style:DialogXIOSStyle", version.ref = "dialogx" }
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
@@ -87,6 +88,8 @@ fastjson2-kotlin = { module = "com.alibaba.fastjson2:fastjson2-kotlin", version.
 fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment-ktx" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+hutool-all = { module = "cn.hutool:hutool-all", version.ref = "hutool" }
+hutool-core = { module = "cn.hutool:hutool-core", version.ref = "hutool" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-databind" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -95,20 +98,23 @@ kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines-android" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
 kotlinx-coroutines-rx3 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-rx3", version.ref = "kotlinx-coroutines-android" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
+ktor-client-core = { module = "io.ktor:ktor-client-core-jvm", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp-jvm", version.ref = "ktor" }
 lifecycle-livedata-core-ktx = { module = "androidx.lifecycle:lifecycle-livedata-core-ktx", version.ref = "lifecycle" }
 lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle" }
 lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
-log-core = { module = "io.github.sakurajimamaii:log-core", version.ref = "log" }
-log-mars = { module = "io.github.sakurajimamaii:log-mars", version.ref = "log" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 material-compose = { module = "androidx.compose.material:material", version.ref = "compose" }
 material3-compose = { module = "androidx.compose.material3:material3", version.ref = "material3-compose" }
 monitor = { module = "androidx.test:monitor", version.ref = "monitor" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+okhttp-sse = { module = "com.squareup.okhttp3:okhttp-sse", version.ref = "okhttp" }
 paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging-compose" }
 paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "paging-runtime" }
 paintedskin = { module = "com.github.CoderAlee.PaintedSkin:painted-skin", version.ref = "paintedskin" }
@@ -119,19 +125,16 @@ reflex = { module = "com.github.CoderAlee:Reflex", version.ref = "reflex" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 runtime-livedata-compose = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "compose" }
 security-crypto = { module = "androidx.security:security-crypto", version.ref = "security-crypto" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 ui-compose = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 ui-graphics-compose = { module = "androidx.compose.ui:ui-graphics", version.ref = "compose" }
 ui-test-manifest-compose = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose" }
 ui-tooling-preview-compose = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
-vastcore = { module = "io.github.sakurajimamaii:VastCore", version.ref = "core" }
-vastnetstatelayout = { module = "io.github.sakurajimamaii:VastNetStateLayout", version.ref = "vastnetstatelayout" }
-vasttools = { module = "io.github.sakurajimamaii:VastTools", version.ref = "tools" }
 zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
 
 [plugins]
-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-androidApplication = { id = "com.android.application", version.ref = "agp" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
+androidApplication = { id = "com.android.application", version.ref = "gradle" }
+androidLibrary = { id = "com.android.library", version.ref = "gradle" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

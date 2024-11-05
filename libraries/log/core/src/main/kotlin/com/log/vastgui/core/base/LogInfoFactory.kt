@@ -16,7 +16,7 @@
 
 package com.log.vastgui.core.base
 
-import com.log.vastgui.core.LogCat
+import com.log.vastgui.core.annotation.LogApi
 import com.log.vastgui.core.internel.LazyMessageWrapper
 import com.log.vastgui.core.plugin.LogJson
 import com.log.vastgui.core.plugin.LogPretty
@@ -26,10 +26,12 @@ import com.log.vastgui.core.plugin.LogPretty
  *
  * @since 1.3.4
  */
-class LogInfoFactory @JvmOverloads constructor(
+class LogInfoFactory @LogApi constructor(
     internal val level: LogLevel,
     internal val tag: String,
     content: Any,
+    internal val threadName: String,
+    internal val stackTrace: StackTraceElement,
     internal val tr: Throwable? = null
 ) {
     internal lateinit var logInfo: LogInfo
@@ -74,21 +76,16 @@ class LogInfoFactory @JvmOverloads constructor(
         return rawContentOrLazy as String
     }
 
-    /**
-     * @since 1.3.4
-     */
+    /** @since 1.3.4 */
     fun build(): LogInfo {
         check(!::logInfo.isInitialized) { "logInfo has been initialized." }
-        val thread = Thread.currentThread()
-        val index = getStackOffset<LogCat>(thread.stackTrace)
         return LogInfo(
-            thread.name,
-            thread.stackTrace[index + 1],
+            threadName,
+            stackTrace,
             level,
             tag,
             System.currentTimeMillis(),
             content() as String,
-            TEXT_TYPE,
             tr
         ).also { logInfo = it }
     }

@@ -20,9 +20,7 @@ package com.log.vastgui.core.annotation
 // Email: guihy2019@gmail.com
 // Date: 2024/5/13 21:34
 
-/**
- * @since 1.3.1
- */
+/** @since 1.3.1 */
 @RequiresOptIn(message = "This API should be used only by the log module.")
 @Retention(AnnotationRetention.BINARY)
 @Target(

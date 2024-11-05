@@ -19,6 +19,7 @@ package com.ave.vastgui.tools.utils
 import android.graphics.Color
 import androidx.annotation.ColorInt
 import androidx.annotation.IntRange
+import kotlin.math.roundToInt
 
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
@@ -30,226 +31,137 @@ object ColorUtils {
     /** Color hex regex.Supported formats are `#RRGGBB` and `#AARRGGBB`. */
     const val COLOR_HEX_REGEX = "^#([A-Fa-f\\d]{6}|[A-Fa-f\\d]{8})$"
 
-    /** Color parse failed. */
-    const val COLOR_PARSE_ERROR = 0
+    /**
+     * Color hex regex pattern.
+     *
+     * @since 1.5.1
+     */
+    val COLOR_HEX_PATTERN = Regex(COLOR_HEX_REGEX)
 
-    /** Wrong result when converting color to RGB. */
-    val COLOR_RGB_ARRAY_ERROR = intArrayOf(-1, -1, -1, -1)
+    /**
+     * Map of color opacity.
+     *
+     * @since 1.5.1
+     */
+    @JvmField
+    val ColorOpacity: Map<Int, String> = buildMap(101) {
+        for (i in 0..100) {
+            put(i, ((i / 100f) * 255f).roundToInt().toString(16).padStart(2, '0').uppercase())
+        }
+    }
 
     /** Map of color transparency. */
     @JvmField
-    val ColorTransparency = mapOf(
-        100 to "FF",
-        99 to "FC",
-        98 to "FA",
-        97 to "F7",
-        96 to "F5",
-        95 to "F2",
-        94 to "F0",
-        93 to "ED",
-        92 to "EB",
-        91 to "E8",
-        90 to "E6",
-        89 to "E3",
-        88 to "E0",
-        87 to "DE",
-        86 to "DB",
-        85 to "D9",
-        84 to "D6",
-        83 to "D4",
-        82 to "D1",
-        81 to "CF",
-        80 to "CC",
-        79 to "C9",
-        78 to "C7",
-        77 to "C4",
-        76 to "C2",
-        75 to "BF",
-        74 to "BD",
-        73 to "BA",
-        72 to "B8",
-        71 to "B5",
-        70 to "B3",
-        69 to "B0",
-        68 to "AD",
-        67 to "AB",
-        66 to "A8",
-        65 to "A6",
-        64 to "A3",
-        63 to "A1",
-        62 to "9E",
-        61 to "9C",
-        60 to "99",
-        59 to "96",
-        57 to "94",
-        56 to "91",
-        56 to "8F",
-        55 to "8C",
-        54 to "8A",
-        53 to "87",
-        52 to "85",
-        51 to "82",
-        50 to "80",
-        49 to "7D",
-        48 to "7A",
-        47 to "78",
-        46 to "75",
-        45 to "73",
-        44 to "70",
-        43 to "6E",
-        42 to "6B",
-        41 to "69",
-        40 to "66",
-        39 to "63",
-        38 to "61",
-        37 to "5E",
-        36 to "5C",
-        35 to "59",
-        34 to "57",
-        33 to "54",
-        32 to "52",
-        31 to "4F",
-        30 to "4D",
-        28 to "4A",
-        28 to "47",
-        27 to "45",
-        26 to "42",
-        25 to "40",
-        24 to "3D",
-        23 to "3B",
-        22 to "38",
-        21 to "36",
-        20 to "33",
-        19 to "30",
-        18 to "2E",
-        17 to "2B",
-        16 to "29",
-        15 to "26",
-        14 to "24",
-        13 to "21",
-        12 to "1F",
-        11 to "1C",
-        10 to "1A",
-        9 to "17",
-        8 to "14",
-        7 to "12",
-        6 to "0F",
-        5 to "0D",
-        4 to "0A",
-        3 to "08",
-        2 to "05",
-        1 to "03",
-        0 to "00"
-    )
+    val ColorTransparency = ColorOpacity.mapKeys { 100 - it.key }
 
     /**
      * Parse the color string, and return the corresponding color-int.
      *
-     * @return the corresponding color-int of the color string,
-     *     [COLOR_PARSE_ERROR] otherwise.
+     * @return The color-int of the [colorHex] , [default] otherwise.
+     * @throws IllegalArgumentException
      * @see Color.parseColor
+     * @since 1.5.1
      */
     @JvmStatic
-    fun colorHex2Int(colorHex: String): Int {
-        return if (isColorHex(colorHex)) {
-            Color.parseColor(colorHex)
-        } else COLOR_PARSE_ERROR
-    }
+    fun colorHex2Int(colorHex: String, default: String = "#00000000"): Int =
+        if (isColorHex(colorHex)) Color.parseColor(colorHex)
+        else if (isColorHex(default)) Color.parseColor(default)
+        else throw IllegalArgumentException("$colorHex $default are all illegal color values.")
 
     /**
      * Converting color hexadecimal string to an array of ARGB.
      *
-     * @param colorHex Color hexadecimal string,for example:#12c2e9.
-     * @return The corresponding color rgb array like {255,63,226,197},
-     *     [COLOR_RGB_ARRAY_ERROR] otherwise.
-     * @since 0.5.3
+     * @param colorHex Color string like **#12c2e9** .
+     * @return The color argb array like **{255,63,226,197}** , [default]
+     * otherwise.
+     * @throws IllegalArgumentException
+     * @since 1.5.1
      */
     @JvmStatic
-    fun colorHex2ARGB(colorHex: String): IntArray {
-        val colorInt = colorHex2Int(colorHex)
-        return if (COLOR_PARSE_ERROR == colorInt) {
-            COLOR_RGB_ARRAY_ERROR
-        } else colorInt2ARGB(colorInt)
+    fun colorHex2ARGB(colorHex: String, default: String = "#00000000"): IntArray {
+        val colorInt = colorHex2Int(colorHex, default)
+        return colorInt2ARGB(colorInt)
     }
 
     /**
-     * Converting color-int to hexadecimal string.
+     * Converting color-int to string.
      *
      * @param colorInt color-int.
-     * @return color hexadecimal string like #3FE2C5.
+     * @return color string like **#3FE2C5** .
+     * @throws IllegalArgumentException
+     * @since 1.5.1
      */
     @JvmStatic
-    fun colorInt2Hex(@ColorInt colorInt: Int): String = colorRGB2Hex(colorInt2ARGB(colorInt))
+    @Throws(IllegalArgumentException::class)
+    fun colorInt2Hex(@ColorInt colorInt: Int, @ColorInt default: Int = Color.TRANSPARENT): String {
+        val hex = fun(value: Int) = value.toString(16).padStart(2, '0')
+        return if (colorInt.toUInt() in 0u..0xFFFFFFFFu) {
+            "#${hex(Color.alpha(colorInt))}${hex(Color.red(colorInt))}${hex(Color.green(colorInt))}${hex(Color.blue(colorInt))}"
+                .uppercase()
+        } else if (default.toUInt() in 0u..0xFFFFFFFFu) {
+            "#${hex(Color.alpha(default))}${hex(Color.red(default))}${hex(Color.green(default))}${hex(Color.blue(default))}"
+                .uppercase()
+        } else {
+            throw IllegalArgumentException("$colorInt(hex=${colorInt.toString(16)}) $default(hex=${default.toString(16)}) are all illegal color values.")
+        }
+    }
 
     /**
      * Converting color-int to an array of ARGB.
      *
      * @param colorInt color-int.
-     * @return An array of ARGB, like {255,63,226,197}.
-     * @since 0.5.3
+     * @return An array of ARGB, like **{255,63,226,197}** .
+     * @throws IllegalArgumentException
+     * @since 1.5.1
      */
     @JvmStatic
-    fun colorInt2ARGB(@ColorInt colorInt: Int): IntArray = intArrayOf(
-        Color.alpha(colorInt), Color.red(colorInt), Color.green(colorInt), Color.blue(colorInt)
-    )
+    fun colorInt2ARGB(@ColorInt colorInt: Int, @ColorInt default: Int = Color.TRANSPARENT): IntArray {
+        return if (colorInt.toUInt() in 0u..0xFFFFFFFFu) {
+            intArrayOf(Color.alpha(colorInt), Color.red(colorInt), Color.green(colorInt), Color.blue(colorInt))
+        } else if (default.toUInt() in 0u..0xFFFFFFFFu) {
+            intArrayOf(Color.alpha(default), Color.red(default), Color.green(default), Color.blue(default))
+        } else {
+            throw IllegalArgumentException("$colorInt(hex=${colorInt.toString(16)}) $default(hex=${default.toString(16)}) are all illegal color values.")
+        }
+    }
 
     /**
-     * Converting an array of RGB to color hexadecimal string.
+     * Converting an argb array to color string.
      *
-     * @param argb an array of RGB like {63,226,197}.
-     * @return Color hexadecimal string like #3FE2C5.
+     * @param argb an argb array like **{63,226,197}** .
+     * @return Color hexadecimal string like **#3FE2C5** .
      */
     @JvmStatic
     fun colorRGB2Hex(argb: IntArray): String {
         var hexCode = "#"
-        for (i in argb.indices) {
-            var rgbItem = argb[i]
-            if (rgbItem < 0) {
-                rgbItem = 0
-            } else if (rgbItem > 255) {
-                rgbItem = 255
-            }
-            val code =
-                arrayOf(
-                    "0",
-                    "1",
-                    "2",
-                    "3",
-                    "4",
-                    "5",
-                    "6",
-                    "7",
-                    "8",
-                    "9",
-                    "A",
-                    "B",
-                    "C",
-                    "D",
-                    "E",
-                    "F"
-                )
-            val lCode = rgbItem / 16
-            val rCode = rgbItem % 16
-            hexCode += code[lCode] + code[rCode]
+        for (value in argb.map { it.coerceIn(0, 255) }) {
+            val lCode = (value and 0x0F).toString(16)
+            val hCode = (value shr 4).toString(16)
+            hexCode += hCode + lCode
         }
-        return hexCode
+        return hexCode.uppercase()
     }
 
     /**
-     * Get the color hex in the format of #AARRGGBB by [transparency] and
+     * Get the color hex in the format of **#AARRGGBB** by [transparency] and
      * [colorInt].
      *
      * If the given [colorInt] itself has transparency, it will be forced to
      * the transparency specified by [transparency].
+     *
+     * @throws IllegalArgumentException
      */
     @JvmStatic
     fun getColorWithTransparency(
         @IntRange(from = 0, to = 100) transparency: Int,
         colorInt: Int
     ): String {
+        if (colorInt.toUInt() in 0u..0xFFFFFFFFu)
+            throw IllegalArgumentException("$colorInt(hex=${colorInt.toString(16)}) is illegal color values.")
         val color = Color.rgb(Color.red(colorInt), Color.green(colorInt), Color.blue(colorInt))
         val colorHex = colorInt2Hex(color)
-        return StringBuilder(colorHex).replace(1, 3, ColorTransparency[transparency]!!).toString()
+        return StringBuilder(colorHex).replace(1, 3, ColorTransparency[transparency.coerceIn(0, 100)]!!)
+            .toString().uppercase()
     }
 
     /**
@@ -258,6 +170,7 @@ object ColorUtils {
      * If the given [colorInt] itself has transparency, it will be forced to
      * the transparency specified by [transparency].
      *
+     * @throws IllegalArgumentException
      * @since 0.5.3
      */
     fun getColorIntWithTransparency(
@@ -270,10 +183,11 @@ object ColorUtils {
      *
      * @param colorHex color hex string.
      * @return true if the color hex string is right,false otherwise.
+     * @since 1.5.1
      */
     @JvmStatic
-    fun isColorHex(colorHex: String): Boolean {
-        return Regex(COLOR_HEX_REGEX).matches(colorHex)
+    fun isColorHex(vararg colorHex: String): Boolean {
+        return colorHex.all { COLOR_HEX_PATTERN.matches(it) }
     }
 
 }

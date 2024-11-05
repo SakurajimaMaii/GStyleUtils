@@ -16,6 +16,7 @@
 
 package com.ave.vastgui.app.net
 
+import com.ave.vastgui.app.net.interceptor.okhttp3Interceptor
 import com.ave.vastgui.tools.network.request.RequestBuilder
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -35,6 +36,6 @@ class WanAndroidApi : RequestBuilder("https://www.wanandroid.com") {
 
     override fun okHttpConfiguration(builder: OkHttpClient.Builder) {
         super.okHttpConfiguration(builder)
-        builder.addInterceptor(mOkhttp3Interceptor)
+        builder.addInterceptor(okhttp3Interceptor)
     }
 }

@@ -20,7 +20,7 @@ package com.log.vastgui.desktop;
 // Email: guihy2019@gmail.com
 // Date: 2024/5/15 11:44
 
-import static com.log.vastgui.desktop.LoggerKt.mLogFactory;
+import static com.log.vastgui.desktop.LogFactoryKt.logFactory;
 
 import com.log.vastgui.core.LogCat;
 import com.sun.tools.javac.Main;
@@ -29,7 +29,7 @@ import org.junit.Test;
 
 public class JavaUnitTest {
 
-    private static final LogCat logcat = mLogFactory.getLogCat(Main.class);
+    private static final LogCat logcat = logFactory.getLogCat(Main.class);
 
     @Test
     public void logTest() {

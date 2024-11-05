@@ -19,7 +19,7 @@ package com.log.vastgui.core.base
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
 // Date: 2024/5/13 23:34
-// Documentation: https://ave.entropy2020.cn/documents/log/log-core/description/
+// Documentation: https://ave.entropy2020.cn/documents/log/log-core/develop/#logstore/
 
 /**
  * Log store.

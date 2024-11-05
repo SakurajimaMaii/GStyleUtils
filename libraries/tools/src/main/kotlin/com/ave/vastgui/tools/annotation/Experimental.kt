@@ -17,7 +17,6 @@
 package com.ave.vastgui.tools.annotation
 
 import android.content.SharedPreferences
-import androidx.annotation.RequiresOptIn
 
 // Author: Vast Gui
 // Email: guihy2019@gmail.com

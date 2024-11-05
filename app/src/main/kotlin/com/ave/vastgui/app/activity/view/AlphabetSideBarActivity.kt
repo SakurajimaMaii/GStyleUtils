@@ -32,7 +32,7 @@ import com.ave.vastgui.app.R
 import com.ave.vastgui.app.adapter.ContactAdapter
 import com.ave.vastgui.app.adapter.entity.Contact
 import com.ave.vastgui.app.databinding.ActivityAlphabetSidebarBinding
-import com.ave.vastgui.app.log.mLogFactory
+import com.ave.vastgui.app.log.logFactory
 import com.ave.vastgui.core.extension.NotNUllVar
 import com.ave.vastgui.tools.utils.ColorUtils
 import com.ave.vastgui.tools.utils.permission.requestPermission
@@ -85,7 +85,7 @@ class AlphabetSideBarActivity : ComponentActivity(R.layout.activity_alphabet_sid
             by viewBinding(ActivityAlphabetSidebarBinding::bind)
     private val mAdapter by lazy { ContactAdapter(this) }
     private var mSmoothScrollLayoutManager by NotNUllVar<SmoothScrollLayoutManager>()
-    private val mLogger = mLogFactory.getLogCat(AlphabetSideBarActivity::class.java)
+    private val mLogger = logFactory.getLogCat(AlphabetSideBarActivity::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

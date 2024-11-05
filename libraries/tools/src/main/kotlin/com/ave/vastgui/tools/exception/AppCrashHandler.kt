@@ -16,10 +16,9 @@
 
 package com.ave.vastgui.tools.exception
 
-import com.ave.vastgui.core.extension.SingletonHolder
 import com.ave.vastgui.core.extension.nothing_to_do
-import com.log.vastgui.core.LogCat
-import com.log.vastgui.core.base.LogLevel
+import java.io.PrintWriter
+import java.io.StringWriter
 
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
@@ -27,25 +26,28 @@ import com.log.vastgui.core.base.LogLevel
 // Description: App global exception handling.
 // Documentation: https://ave.entropy2020.cn/documents/tools/core-topics/exception/app-crash-handler/
 
-/** @since 1.4.1 */
-typealias dealAppCrash = (Thread, Throwable) -> Unit
+/** @since 1.5.1 */
+@FunctionalInterface
+fun interface UncaughtExceptionHandler {
+    fun dealAppCrash(t: Thread, e: Throwable, stackTraceInfo: String)
+}
 
 /**
- * App global exception handling, you can configure log printing and
- * subsequent actions to be taken by setting [configuration].
+ * App global exception handling.
  *
  * Here is a usage example:
  * ```kotlin
  * // App.kt
- * private val crashConfig = AppCrashHandler
- *      .Configuration(mLogFactory.getLog(App::class.java))
- *
  * class App : Application() {
+ *
+ *     private val mLogger = ...
  *
  *     override fun onCreate() {
  *         super.onCreate()
  *         ...
- *         Thread.setDefaultUncaughtExceptionHandler(AppCrashHandler.getInstance(crashConfig))
+ *         setDefaultUncaughtExceptionHandler { t, e, stackTraceInfo ->
+ *             mLogger.e(stackTraceInfo)
+ *         }
  *     }
  *
  * }
@@ -53,27 +55,31 @@ typealias dealAppCrash = (Thread, Throwable) -> Unit
  *
  * @since 1.4.1
  */
-class AppCrashHandler private constructor(private val configuration: Configuration) :
-    Thread.UncaughtExceptionHandler {
-
-    /**
-     * [AppCrashHandler] configuration.
-     *
-     * @since 1.4.1
-     */
-    class Configuration @JvmOverloads constructor(
-        val logger: LogCat? = null,
-        val action: dealAppCrash = { _, _ -> nothing_to_do() }
-    )
-
-    override fun uncaughtException(thread: Thread, exception: Throwable) {
-        if (null != configuration.logger) {
-            val logger = configuration.logger
-            val content = "Please refer to exception."
-            logger.log(LogLevel.ERROR, logger.mDefaultTag, content, exception)
+open class AppCrashHandler private constructor(): Thread.UncaughtExceptionHandler {
+    final override fun uncaughtException(t: Thread, e: Throwable) {
+        val sw = StringWriter()
+        PrintWriter(sw, false).use {
+            var cause = e.cause
+            while (null != cause) {
+                cause.printStackTrace(it)
+                cause = cause.cause
+            }
+            it.flush()
         }
-        configuration.action(thread, exception)
+        uncaughtException(t, e, sw.toString())
     }
 
-    companion object : SingletonHolder<AppCrashHandler, Configuration>(::AppCrashHandler)
+    open fun uncaughtException(thread: Thread, throwable: Throwable, stackTraceInfo: String) {
+        nothing_to_do()
+    }
+
+    companion object {
+        fun setDefaultUncaughtExceptionHandler(action: UncaughtExceptionHandler) {
+            Thread.setDefaultUncaughtExceptionHandler(object : AppCrashHandler() {
+                override fun uncaughtException(thread: Thread, throwable: Throwable, stackTraceInfo: String) {
+                    action.dealAppCrash(thread, throwable, stackTraceInfo)
+                }
+            })
+        }
+    }
 }

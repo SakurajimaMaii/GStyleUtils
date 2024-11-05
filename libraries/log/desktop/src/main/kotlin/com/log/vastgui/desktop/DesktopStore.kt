@@ -37,7 +37,7 @@ private val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
  * Desktop log store.
  *
  * ```kotlin
- * val mLogFactory: LogFactory = getLogFactory {
+ * val logFactory: LogFactory = getLogFactory {
  *     ...
  *     install(LogStorage) {
  *         logStore = LogStore.desktop("", 1024L * 1000)
@@ -49,8 +49,8 @@ private val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
  * @param fileMaxSize The size of a single log file(in bytes).
  * @param logFormat The format of log in files.
  * @see <a
- *     href="https://github.com/SakurajimaMaii/Android-Vast-Extension/tree/develop/libraries/log/desktop/log">Example
- *     log file</a>
+ * href="https://github.com/SakurajimaMaii/Android-Vast-Extension/tree/develop/libraries/log/desktop/log">Example
+ * log file</a>
  * @since 1.3.1
  */
 fun LogStore.Companion.desktop(

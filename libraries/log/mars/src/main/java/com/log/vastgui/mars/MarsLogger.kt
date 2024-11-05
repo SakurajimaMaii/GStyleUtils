@@ -78,13 +78,13 @@ class MarsLogger private constructor(override val logFormat: LogFormat) :
     Logger {
     override fun log(logInfo: LogInfo) {
         val content = logFormat.format(logInfo)
-        when (logInfo.mLevel) {
-            LogLevel.VERBOSE -> Log.v(logInfo.mTag, logInfo, content)
-            LogLevel.DEBUG -> Log.d(logInfo.mTag, logInfo, content)
-            LogLevel.INFO -> Log.i(logInfo.mTag, logInfo, content)
-            LogLevel.WARN -> Log.w(logInfo.mTag, logInfo, content)
-            LogLevel.ERROR -> Log.e(logInfo.mTag, logInfo, content)
-            LogLevel.ASSERT -> Log.f(logInfo.mTag, logInfo, content)
+        when (logInfo.level) {
+            LogLevel.VERBOSE -> Log.v(logInfo.tag, logInfo, content)
+            LogLevel.DEBUG -> Log.d(logInfo.tag, logInfo, content)
+            LogLevel.INFO -> Log.i(logInfo.tag, logInfo, content)
+            LogLevel.WARN -> Log.w(logInfo.tag, logInfo, content)
+            LogLevel.ERROR -> Log.e(logInfo.tag, logInfo, content)
+            LogLevel.ASSERT -> Log.f(logInfo.tag, logInfo, content)
         }
     }
 

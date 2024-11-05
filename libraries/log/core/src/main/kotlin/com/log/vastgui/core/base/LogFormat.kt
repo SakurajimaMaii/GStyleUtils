@@ -23,9 +23,6 @@ import java.util.Locale
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
 // Date: 2024/6/20 22:23
-// Description: 
-// Documentation:
-// Reference:
 
 /**
  * Log formatter.

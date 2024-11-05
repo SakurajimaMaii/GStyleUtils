@@ -21,7 +21,7 @@ import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.os.Bundle
 import com.ave.vastgui.app.databinding.ActivityArcProgressViewBinding
-import com.ave.vastgui.app.log.mLogFactory
+import com.ave.vastgui.app.log.logFactory
 import com.ave.vastgui.tools.activity.VastVbActivity
 import com.ave.vastgui.tools.manager.filemgr.FileMgr
 import com.ave.vastgui.tools.utils.ColorUtils
@@ -39,7 +39,7 @@ import java.io.File
 
 class ArcProgressViewActivity : VastVbActivity<ActivityArcProgressViewBinding>() {
 
-    private val mLogger = mLogFactory.getLogCat(ArcProgressViewActivity::class.java)
+    private val mLogger = logFactory.getLogCat(ArcProgressViewActivity::class.java)
     private lateinit var downloadTask: DLTask
 
     override fun onCreate(savedInstanceState: Bundle?) {

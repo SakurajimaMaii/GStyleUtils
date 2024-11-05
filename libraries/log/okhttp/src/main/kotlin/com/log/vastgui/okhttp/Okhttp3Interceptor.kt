@@ -17,9 +17,11 @@
 package com.log.vastgui.okhttp
 
 import com.ave.vastgui.core.extension.NotNullOrDefault
-import com.ave.vastgui.core.extension.SingletonHolder
+import com.ave.vastgui.core.extension.nothing_to_do
 import com.log.vastgui.core.LogCat
+import com.log.vastgui.core.annotation.LogExperimental
 import com.log.vastgui.core.base.LogLevel
+import com.log.vastgui.core.base.LogTag
 import com.log.vastgui.okhttp.base.ContentLevel
 import okhttp3.Connection
 import okhttp3.Interceptor
@@ -27,8 +29,10 @@ import okhttp3.MediaType
 import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.Response
+import okhttp3.ResponseBody.Companion.asResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.internal.http.promisesBody
+import okhttp3.internal.sse.ServerSentEventReader
 import okio.Buffer
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -47,29 +51,31 @@ import java.util.concurrent.TimeUnit
 /**
  * Log interceptor of Okhttp3.
  *
- * The following is an example of usage, you can click
- * [link](https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/app/src/main/kotlin/com/ave/vastgui/app/net/OpenApi.kt)
- * to view the complete code.
- *
  * ```kotlin
- * // OpenApi.kt
- * class OpenApi : RequestBuilder("https://api.apiopen.top") {
- *     ...
+ * // Add Interceptor
+ * val logcat = logFactory("global")
+ * val okhttp = OkHttpClient
+ *     .Builder()
+ *     .addInterceptor(Okhttp3Interceptor(logcat))
+ *     .build()
  *
- *     override fun okHttpConfiguration(builder: OkHttpClient.Builder) {
- *         super.okHttpConfiguration(builder)
- *         mLogger = mLogFactory.getLog(OpenApi::class.java)
- *         mOkhttp3Interceptor = Okhttp3Interceptor.getInstance(mLogger)
- *         builder.addInterceptor(mOkhttp3Interceptor)
- *     }
- * }
+ * // Make a request
+ * val request: Request = Request.Builder()
+ *     .url("http://127.0.0.1:7777")
+ *     .build()
+ * okhttp.newCall(request).execute()
  * ```
  *
  * @see <img
- *     src=https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/log/okhttp/image/log.png?raw=true>
+ * src=https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/log/okhttp/image/log.png?raw=true>
  * @since 1.3.3
  */
-class Okhttp3Interceptor private constructor(private val logger: LogCat) : Interceptor {
+class Okhttp3Interceptor(private val logcat: LogCat) :
+    Interceptor {
+
+    /** @since 1.3.7 */
+    private val sanitizedHeaders: MutableMap<String, String> = HashMap()
+
     /**
      * The filter function allows you to filter log messages for requests
      * matching the specified predicate. Return true directly by default.
@@ -108,6 +114,7 @@ class Okhttp3Interceptor private constructor(private val logger: LogCat) : Inter
      */
     var bodyJsonConverter: ((String) -> String)? = null
 
+    @OptIn(LogExperimental::class)
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val request: Request = chain.request()
@@ -120,7 +127,7 @@ class Okhttp3Interceptor private constructor(private val logger: LogCat) : Inter
         try {
             response = chain.proceed(request)
         } catch (e: Exception) {
-            logger.e(logger.mDefaultTag, "<-- HTTP FAILED", e)
+            logcat.e(LogTag(logcat.tag), "<-- HTTP FAILED", e)
             throw e
         }
         val tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs)
@@ -132,6 +139,7 @@ class Okhttp3Interceptor private constructor(private val logger: LogCat) : Inter
      *
      * @since 1.3.3
      */
+    @OptIn(LogExperimental::class)
     private fun dealRequestLog(request: Request, connection: Connection?) {
         val requestLog = StringBuilder()
         val requestBody = request.body
@@ -141,20 +149,10 @@ class Okhttp3Interceptor private constructor(private val logger: LogCat) : Inter
                 requestLog.appendLine("--> ${request.method} ${request.url} $protocol")
             }
             if (contentLevel.headers) {
-                if (null != requestBody) {
-                    if (requestBody.contentType() != null) {
-                        requestLog.appendLine("\tContent-Type:${requestBody.contentType()}")
-                    }
-                    if (requestBody.contentLength() != -1L) {
-                        requestLog.appendLine("\tContent-Length:${requestBody.contentLength()}")
-                    }
-                }
                 val headers = request.headers
-                headers.forEachIndexed { index, _ ->
+                request.headers.forEachIndexed { index, _ ->
                     val name = headers.name(index)
-                    if ("Content-Type" != name && "Content-Length" != name) {
-                        requestLog.appendLine("\t$name:${headers.value(index)}")
-                    }
+                    requestLog.appendLine("\t$name:${sanitizedHeaders[name] ?: headers.value(index)}")
                 }
             }
             if (contentLevel.body && null != requestBody) {
@@ -165,14 +163,14 @@ class Okhttp3Interceptor private constructor(private val logger: LogCat) : Inter
                 }
             }
         } catch (e: Exception) {
-            logger.e(
-                logger.mDefaultTag,
+            logcat.e(
+                LogTag(logcat.tag),
                 "Exception encountered while processing request information",
                 e
             )
         } finally {
             requestLog.append("--> END ${request.method}")
-            log(requestLevel(request), logger.mDefaultTag, requestLog.toString())
+            logcat.log(requestLevel(request), LogTag(logcat.tag)(), requestLog.toString(), null, Throwable().stackTrace[0])
         }
     }
 
@@ -181,6 +179,7 @@ class Okhttp3Interceptor private constructor(private val logger: LogCat) : Inter
      *
      * @since 1.3.3
      */
+    @OptIn(LogExperimental::class)
     private fun dealResponseLog(response: Response, tookMs: Long): Response {
         val requestLog = StringBuilder()
         val builder = response.newBuilder()
@@ -199,7 +198,39 @@ class Okhttp3Interceptor private constructor(private val logger: LogCat) : Inter
             }
             if (contentLevel.body && clone.promisesBody()) {
                 if (responseBody == null) return response
-                if (isPlaintext(responseBody.contentType())) {
+                if (isEventStream(responseBody.contentType())) {
+                    var isFirst = true
+                    // https://stackoverflow.com/a/40002832/16905468
+                    // https://stackoverflow.com/a/33862068/16905468
+                    val source = responseBody.source()
+                        .apply { request(Long.MAX_VALUE) }
+                    val bufferClone = source.buffer.clone()
+                    val body = bufferClone
+                        .asResponseBody(responseBody.contentType(), responseBody.contentLength())
+                    val reader =
+                        ServerSentEventReader(source, object : ServerSentEventReader.Callback {
+                            override fun onEvent(id: String?, type: String?, data: String) {
+                                val json = bodyJsonConverter
+                                    ?.invoke(data)
+                                    ?.replace("\n", "\n\t      ")
+                                val tab = if (isFirst) {
+                                    isFirst = false; "body:"
+                                } else "     "
+                                requestLog.appendLine("\t $tab${json ?: data}")
+                            }
+
+                            override fun onRetryChange(timeMs: Long) {
+                                nothing_to_do()
+                            }
+                        })
+                    while (reader.processNextEvent()) {
+                        nothing_to_do()
+                    }
+
+                    return response.newBuilder().body(body).build()
+                }
+                // Deal response as text
+                else if (isPlaintext(responseBody.contentType())) {
                     val bufferSize = 1024 * 8
                     val bytes = ByteArrayOutputStream().use { output ->
                         responseBody!!.byteStream().copyTo(output, bufferSize)
@@ -218,14 +249,14 @@ class Okhttp3Interceptor private constructor(private val logger: LogCat) : Inter
                 }
             }
         } catch (e: Exception) {
-            logger.e(
-                logger.mDefaultTag,
+            logcat.e(
+                LogTag(logcat.tag),
                 "Exception encountered while processing response information",
                 e
             )
         } finally {
             requestLog.append("<-- END HTTP")
-            log(responseLevel(response), logger.mDefaultTag, requestLog.toString())
+            logcat.log(responseLevel(response), LogTag(logcat.tag)(), requestLog.toString(), null, Throwable().stackTrace[0])
         }
         return response
     }
@@ -235,6 +266,7 @@ class Okhttp3Interceptor private constructor(private val logger: LogCat) : Inter
      *
      * @since 1.3.3
      */
+    @OptIn(LogExperimental::class)
     private fun StringBuilder.bodyToString(request: Request) {
         try {
             val copy = request.newBuilder().build()
@@ -248,17 +280,35 @@ class Okhttp3Interceptor private constructor(private val logger: LogCat) : Inter
                 ?.replace("\n", "\n\t     ")
             appendLine("\tbody:${json ?: bodyJson}")
         } catch (e: Exception) {
-            logger.e(logger.mDefaultTag, "Exception encountered while processing request body", e)
+            logcat.e(LogTag(logcat.tag), "Exception encountered while processing request body", e)
         }
     }
 
-    /** @since 1.3.3 */
-    private fun log(level: LogLevel, tag: String, content: String, tr: Throwable? = null) {
-        logger.log(level, tag, content, tr)
+    /**
+     * Allows you to sanitize sensitive headers to avoid their values appearing
+     * in the logs. In the example below, Authorization header value will be
+     * replaced with '***' when logging:
+     *
+     * ```kotlin
+     * Okhttp3Interceptor(logcat)
+     *      .sanitizedHeaders("Authorization","***")
+     * ```
+     *
+     * @since 1.3.9
+     */
+    fun sanitizedHeaders(header: String, replaceWith: String) = apply {
+        sanitizedHeaders[header] = replaceWith
     }
 
-    companion object : SingletonHolder<Okhttp3Interceptor, LogCat>(::Okhttp3Interceptor) {
+    companion object {
         private val UTF8: Charset = StandardCharsets.UTF_8
+
+        /**
+         * This method is only for compatibility with the way [Okhttp3Interceptor]
+         * was created before version 1.3.5.
+         */
+        @Deprecated("Use constructor instead.", ReplaceWith("Okhttp3Interceptor(arg)"))
+        fun getInstance(arg: LogCat): Okhttp3Interceptor = Okhttp3Interceptor(arg)
 
         /**
          * Get charset.
@@ -289,6 +339,11 @@ class Okhttp3Interceptor private constructor(private val logger: LogCat) : Inter
                     subtype.contains("json") ||
                     subtype.contains("xml") ||
                     subtype.contains("html")
+        }
+
+        /** @since 1.3.5 */
+        private fun isEventStream(mediaType: MediaType?): Boolean {
+            return mediaType?.type == "text" && mediaType.subtype == "event-stream"
         }
     }
 }

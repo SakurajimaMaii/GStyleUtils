@@ -33,10 +33,20 @@ import com.ave.vastgui.tools.constant.DEFAULT_LOG_TAG
 // Date: 2024/3/30
 // Documentation: https://ave.entropy2020.cn/documents/tools/core-topics/ui/extension/view/
 
-// ---------- Visibility ----------
+// region Visibility
 /** @since 1.2.1 */
 fun View.gone() {
     isGone = true
+}
+
+/** @since 1.5.1 */
+fun View.goneIfVisible() {
+    if (isVisible) gone()
+}
+
+/** @since 1.5.1 */
+fun View.goneIfInvisible() {
+    if (isInvisible) gone()
 }
 
 /** @since 1.2.1 */
@@ -44,12 +54,34 @@ fun View.visible() {
     isVisible = true
 }
 
+/** @since 1.5.1 */
+fun View.visibleIfGone() {
+    if (isGone) visible()
+}
+
+/** @since 1.5.1 */
+fun View.visibleIfInvisible() {
+    if (isInvisible) visible()
+}
+
 /** @since 1.2.1 */
 fun View.invisible() {
     isInvisible = true
 }
 
-// ---------- KeyBroad ----------
+/** @since 1.5.1 */
+fun View.invisibleIfVisible() {
+    if (isVisible) invisible()
+}
+
+/** @since 1.5.1 */
+fun View.invisibleIfGone() {
+    if (isGone) invisible()
+}
+
+// endregion
+
+// region KeyBroad
 /**
  * Show KeyBroad.
  *
@@ -109,3 +141,5 @@ fun EditText.isShouldHideKeyBroad(event: MotionEvent): Boolean {
     return !(event.rawX in left.toFloat()..(left + measuredWidth).toFloat() &&
             event.rawY in top.toFloat()..(top + measuredHeight).toFloat())
 }
+
+// endregion

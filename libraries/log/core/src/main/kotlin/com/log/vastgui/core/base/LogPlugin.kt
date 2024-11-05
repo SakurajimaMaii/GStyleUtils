@@ -21,7 +21,6 @@ import com.log.vastgui.core.LogCat
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
 // Date: 2023/7/5
-// Documentation: https://ave.entropy2020.cn/documents/log/log-core/description/
 
 /**
  * Log plugin

@@ -21,7 +21,6 @@ import com.log.vastgui.core.annotation.LogApi
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
 // Date: 2023/9/7
-// Documentation: https://ave.entropy2020.cn/documents/log/log-core/description/
 
 /**
  * Return true if the content of the [LogInfo] does not need to be split,
@@ -31,7 +30,7 @@ import com.log.vastgui.core.annotation.LogApi
  */
 @LogApi
 fun LogInfo.needCut(maxSingleLogLength: Int) =
-    !(mPrintLength < maxSingleLogLength || (maxSingleLogLength * 4) >= mPrintBytesLength)
+    !(printLength < maxSingleLogLength || (maxSingleLogLength * 4) >= printBytesLength)
 
 /**
  * Cutting the byte array as a string according to [maxSingleLogLength].

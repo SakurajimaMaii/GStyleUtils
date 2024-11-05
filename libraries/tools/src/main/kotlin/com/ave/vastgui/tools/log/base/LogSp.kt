@@ -17,7 +17,6 @@
 package com.ave.vastgui.tools.log.base
 
 import android.content.SharedPreferences
-import androidx.test.internal.util.LogUtil
 import com.ave.vastgui.tools.sharedpreferences.ISharedPreferencesOwner
 import com.ave.vastgui.tools.sharedpreferences.SpEncrypted
 import com.ave.vastgui.tools.sharedpreferences.string
@@ -34,13 +33,14 @@ import com.ave.vastgui.tools.sharedpreferences.string
  */
 class LogSp internal constructor() : ISharedPreferencesOwner {
 
-    override val name: String = LogUtil::class.java.name
+    override val name: String = DEFAULT_SP_NAME
     override val kv: SharedPreferences by lazy {
         SpEncrypted(name).getSharedPreferences()
     }
 
     companion object {
         internal const val DEFAULT_FILE_NAME = ""
+        internal const val DEFAULT_SP_NAME = "log_sp"
     }
 
     internal var mCurrentFileName by string(DEFAULT_FILE_NAME)

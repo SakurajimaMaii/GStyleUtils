@@ -93,23 +93,21 @@ android {
     sourceSets["main"].java.srcDirs("src/main/kotlin", "src/main/java")
 }
 
+kotlin.sourceSets.all {
+    languageSettings.optIn("com.log.vastgui.core.annotation.LogApi")
+}
+
 dependencies {
-    implementation(libs.dialogx)
-    implementation(libs.dialogxiosstyle)
-    implementation(projects.libraries.netstatelayout)
-    implementation(projects.libraries.adapter)
-    implementation(projects.libraries.core)
-    implementation(projects.libraries.tools)
-    implementation(libs.log.core)
-    implementation(libs.log.mars)
-    implementation(projects.libraries.log.okhttp)
     implementation(libs.activity.ktx)
     implementation(libs.adapter.rxjava3)
+    implementation(libs.androidx.navigation.fragment)
     implementation(libs.androidx.swiperefreshlayout)
     implementation(libs.coil)
     implementation(libs.constraintlayout)
     implementation(libs.converter.gson)
     implementation(libs.core.splashscreen)
+    implementation(libs.dialogx)
+    implementation(libs.dialogxiosstyle)
     implementation(libs.fragment.ktx)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlinx.coroutines.android)
@@ -129,5 +127,11 @@ dependencies {
     implementation(libs.reflex)
     implementation(libs.retrofit)
     implementation(libs.security.crypto)
-    implementation(libs.androidx.navigation.fragment)
+    implementation(projects.libraries.adapter)
+    implementation(projects.libraries.kernel)
+    implementation(projects.libraries.log.mars)
+    implementation(projects.libraries.log.okhttp)
+    implementation(projects.libraries.log.android)
+    implementation(projects.libraries.netstatelayout)
+    implementation(projects.libraries.tools)
 }

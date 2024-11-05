@@ -25,7 +25,7 @@ import com.ave.vastgui.adapter.BaseBindAdapter
 import com.ave.vastgui.app.R
 import com.ave.vastgui.app.adapter.entity.Images
 import com.ave.vastgui.app.databinding.FragmentImagesBinding
-import com.ave.vastgui.app.log.mLogFactory
+import com.ave.vastgui.app.log.logFactory
 import com.ave.vastgui.app.net.OpenApi
 import com.ave.vastgui.app.net.OpenApiService
 import com.ave.vastgui.tools.fragment.VastVbFragment
@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 class ImagesFragment : VastVbFragment<FragmentImagesBinding>() {
 
     private val mAdapter by lazy { BaseBindAdapter<Images.Image>(requireContext(), BR.image) }
-    private val mLogger = mLogFactory.getLogCat(VideosFragment::class.java)
+    private val mLogger = logFactory.getLogCat(VideosFragment::class.java)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         getBinding().imagesRv.apply {

@@ -26,7 +26,7 @@ import androidx.core.util.forEach
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
 // Date: 2021/11/5
-// Documentation: https://ave.entropy2020.cn/documents/VastNetStateLayout/usage/
+// Documentation: https://ave.entropy2020.cn/documents/net-state-layout/usage/
 
 /**
  * [NetStateLayout] is a layout to set network state page.
@@ -57,7 +57,8 @@ class NetStateLayout @JvmOverloads constructor(
 
     /** Add all different state layouts to the frame layout */
     private fun addNetStateView() {
-        val layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+        val layoutParams =
+            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         mNetStateMgr.apply {
             addView(loadingVs, layoutParams)
             addView(netErrorVs, layoutParams)
@@ -99,7 +100,10 @@ class NetStateLayout @JvmOverloads constructor(
         if (!checkVs(NetState.NET_ERROR)) {
             val view = mNetStateMgr.netErrorVs.run {
                 setOnInflateListener { _, inflated ->
-                    mNetStateMgr.mOnNetErrorListener?.onNetErrorInflate(inflated, throwable)
+                    mNetStateMgr.mOnNetErrorListener?.onNetErrorInflate(
+                        inflated,
+                        throwable
+                    )
                 }
                 inflate()
             }
@@ -147,7 +151,9 @@ class NetStateLayout @JvmOverloads constructor(
         if (!checkVs(NetState.EMPTY_DATA)) {
             val view = mNetStateMgr.emptyDataVs.run {
                 setOnInflateListener { _, inflated ->
-                    mNetStateMgr.mOnEmptyDataListener?.onEmptyDataInflate(inflated)
+                    mNetStateMgr.mOnEmptyDataListener?.onEmptyDataInflate(
+                        inflated
+                    )
                 }
                 inflate()
             }

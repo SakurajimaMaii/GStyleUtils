@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 VastGui guihy2019@gmail.com
+ * Copyright 2021-2024 VastGui
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
  */
 
 plugins {
-    alias(libs.plugins.compose.compiler)
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp")
+    kotlin("android")
     kotlin("plugin.serialization")
+    id("com.android.application")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -69,6 +68,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -83,19 +83,18 @@ android {
         compose = true
     }
 
-    sourceSets {
-        getByName("main").java.srcDirs("src/main/kotlin")
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.7"
     }
 
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
+    sourceSets {
+        getByName("main").java.srcDirs("src/main/kotlin")
     }
 }
 
 dependencies {
     debugImplementation(libs.ui.test.manifest.compose)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.activity.compose)
     implementation(libs.adapter.rxjava3)
     implementation(libs.coil.compose)
@@ -113,8 +112,12 @@ dependencies {
     implementation(libs.paging.compose)
     implementation(libs.retrofit)
     implementation(libs.runtime.livedata.compose)
+    implementation(libs.slf4j.api)
     implementation(libs.ui.compose)
     implementation(libs.ui.graphics.compose)
     implementation(libs.ui.tooling.preview.compose)
+    implementation(projects.libraries.kernel)
+    implementation(projects.libraries.log.core)
+    implementation(projects.libraries.log.slf4j)
     implementation(projects.libraries.tools)
 }

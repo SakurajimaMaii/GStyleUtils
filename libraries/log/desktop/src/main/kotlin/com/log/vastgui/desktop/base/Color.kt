@@ -20,7 +20,7 @@ package com.log.vastgui.desktop.base
 // Email: guihy2019@gmail.com
 // Date: 2024/5/15 10:43
 // Description: Text color of log content in terminal.
-// Documentation: https://ave.entropy2020.cn/documents/log/log-desktop/logger/
+// Documentation: https://ave.entropy2020.cn/documents/log/log-desktop/usage/
 
 const val Reset  = "\u001B[0m"
 const val Red    = "\u001B[31m"
