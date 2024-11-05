@@ -154,8 +154,7 @@ inline fun ComponentActivity.requestMultiplePermissions(
     val mBuilder = MultiPermissionBuilder().also(builder)
     val declaredPermissions = packageManager
         .getPackageInfo(AppUtils.getPackageName(), PackageManager.GET_PERMISSIONS)
-        .requestedPermissions
-        .toSet()
+        .requestedPermissions?.toSet() ?: emptySet()
     val requestPermissions = permissions.filter { !declaredPermissions.contains(it) }
     if (requestPermissions.isNotEmpty()) {
         mBuilder.noDeclare(requestPermissions)
@@ -218,8 +217,7 @@ inline fun Fragment.requestMultiplePermissions(
     val mBuilder = MultiPermissionBuilder().also(builder)
     val declaredPermissions = requireActivity().packageManager
         .getPackageInfo(AppUtils.getPackageName(), PackageManager.GET_PERMISSIONS)
-        .requestedPermissions
-        .toSet()
+        .requestedPermissions?.toSet() ?: emptySet()
     val requestPermissions = permissions.filter { !declaredPermissions.contains(it) }
     if (requestPermissions.isNotEmpty()) {
         mBuilder.noDeclare(requestPermissions)

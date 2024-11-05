@@ -39,7 +39,7 @@ object AppUtils {
      *
      * @param callback The default value.
      * @return App name,like VastUtilsSampleDemo or [callback] if [callback] is
-     *     not null,throw exception otherwise.
+     * not null,throw exception otherwise.
      * @throws Resources.NotFoundException
      * @throws PackageManager.NameNotFoundException
      * @since 0.5.1
@@ -47,7 +47,8 @@ object AppUtils {
     @JvmStatic
     @Throws(Resources.NotFoundException::class, PackageManager.NameNotFoundException::class)
     fun getAppName(callback: String? = null): String = try {
-        val labelRes = getPackageInfo().applicationInfo.labelRes
+        val labelRes = getPackageInfo().applicationInfo?.labelRes
+            ?: throw PackageManager.NameNotFoundException("Can't find the app name.")
         ContextHelper.getAppContext().resources.getString(labelRes)
     } catch (exception: Exception) {
         callback ?: throw exception
@@ -58,7 +59,7 @@ object AppUtils {
      *
      * @param callback The default value.
      * @return The version name of the current application,like 1.0 or callback
-     *     if callback is not null,throw exception otherwise.
+     * if callback is not null,throw exception otherwise.
      * @throws PackageManager.NameNotFoundException
      * @since 0.5.1
      */
@@ -66,6 +67,7 @@ object AppUtils {
     @Throws(PackageManager.NameNotFoundException::class)
     fun getVersionName(callback: String? = null): String = try {
         getPackageInfo().versionName
+            ?: throw PackageManager.NameNotFoundException("Can't find the version name.")
     } catch (exception: Exception) {
         callback ?: throw exception
     }
@@ -75,7 +77,7 @@ object AppUtils {
      *
      * @param callback The default value.
      * @return The version code of the current application,like 1 or callback
-     *     if callback is not null,throw exception otherwise.
+     * if callback is not null,throw exception otherwise.
      * @throws PackageManager.NameNotFoundException
      * @since 0.5.1
      */
@@ -120,7 +122,7 @@ object AppUtils {
      *
      * @param callback The default value.
      * @return The package name of the application,like com.gcode.vastutils or
-     *     callback if callback is not null,throw exception otherwise.
+     * callback if callback is not null,throw exception otherwise.
      * @throws PackageManager.NameNotFoundException
      * @since 0.5.1
      */
@@ -136,7 +138,7 @@ object AppUtils {
      * Get app icon bitmap.
      *
      * @return The icon of the application or [callback] if [callback] is not
-     *     null,throw exception otherwise.
+     * null,throw exception otherwise.
      * @since 0.5.1
      */
     @JvmStatic
@@ -168,7 +170,7 @@ object AppUtils {
      * Get memory information.
      *
      * @return The maxMemory, freeMemory, totalMemory of the application in
-     *     turn.
+     * turn.
      */
     @JvmStatic
     fun getMemoryInfo(): Triple<Double, Double, Double> {
