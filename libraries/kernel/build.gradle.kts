@@ -16,7 +16,6 @@
 
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.net.URL
 
@@ -28,7 +27,7 @@ plugins {
 }
 
 group = "io.github.sakurajimamaii"
-version = "0.1.1"
+version = "0.1.2"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -42,10 +41,15 @@ tasks.named<KotlinJvmCompile>("compileKotlin") {
     }
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 sourceSets["main"].java.srcDir("src/main/kotlin")
 
 dependencies {
     implementation(libs.kotlin.reflect)
+    testImplementation(kotlin("test"))
 }
 
 extra["PUBLISH_ARTIFACT_ID"] = "VastCore"
@@ -60,7 +64,7 @@ if (mavenPropertiesFile.exists()) {
             register<MavenPublication>("release") {
                 groupId = "io.github.sakurajimamaii"
                 artifactId = "VastCore"
-                version = "0.1.1"
+                version = "0.1.2"
 
                 afterEvaluate {
                     from(components["java"])
@@ -75,7 +79,7 @@ tasks.withType<DokkaTaskPartial> {
         moduleName.set("core")
         sourceLink {
             localDirectory.set(projectDir.resolve("src"))
-            remoteUrl.set(URL("https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/core/src"))
+            remoteUrl.set(URL("https://github.com/SakurajimaMaii/Android-Vast-Extension/blob/develop/libraries/kernel/src"))
             remoteLineSuffix.set("#L")
         }
     }
