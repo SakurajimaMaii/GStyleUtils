@@ -35,16 +35,16 @@ repositories {
 }
 
 dependencies {
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("cn.hutool:hutool-all:5.8.26")
+    implementation(libs.hutool.all)
+    implementation(libs.jackson.module.kotlin)
+    implementation(libs.reactor.kotlin.extensions)
+    implementation(libs.kotlinx.coroutines.reactor)
+    implementation(libs.spring.boot.starter.webflux)
     implementation(libs.kotlin.reflect)
-    testImplementation("io.projectreactor:reactor-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(libs.reactor.test)
+    testImplementation(libs.kotlin.test.junit5)
+    testImplementation(libs.spring.boot.starter.test)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 kotlin {
