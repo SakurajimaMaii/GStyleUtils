@@ -31,13 +31,9 @@ ext["ossrhPassword"] = null
 // Grabbing secrets from local.properties file or from environment variables, which could be used on CI
 val secretPropsFile: File = project.rootProject.file("maven.properties")
 if (secretPropsFile.exists()) {
-    secretPropsFile.reader().use {
-        Properties().apply {
-            load(it)
-        }
-    }.onEach { (name, value) ->
-        ext[name.toString()] = value
-    }
+    secretPropsFile.reader()
+        .use { Properties().apply { load(it) } }
+        .onEach { (name, value) -> ext[name.toString()] = value }
 } else {
     ext["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
     ext["signing.password"] = System.getenv("SIGNING_PASSWORD")
