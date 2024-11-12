@@ -1,8 +1,14 @@
-
+import android.net.ConnectivityManager
+import android.net.wifi.WifiManager
+import android.util.Log
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ave.vastgui.tools.utils.NetStateUtils
+import com.ave.vastgui.tools.utils.NetStateUtils.getConnectivityManager
+import com.ave.vastgui.tools.utils.NetStateUtils.getWifiManager
 import org.junit.Assert
 import org.junit.Test
+import org.junit.runner.RunWith
 
 /*
  * Copyright 2021-2024 VastGui
@@ -24,12 +30,56 @@ import org.junit.Test
 // Email: guihy2019@gmail.com
 // Date: 2024/11/5
 
+@RunWith(AndroidJUnit4::class)
 class NetStateUtilsTest {
 
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+
     @Test
-    fun wifiState() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
+    fun getWifiManager() {
+        Assert.assertEquals(WifiManager::class.java, context.getWifiManager()::class.java)
+    }
+
+    @Test
+    fun getConnectivityManager() {
+        Assert.assertEquals(ConnectivityManager::class.java, context.getConnectivityManager()::class.java)
+    }
+
+    @Test
+    fun hasWIFI() {
+        val network = NetStateUtils.hasWIFI(context)
+        val address = context.getConnectivityManager()
+            .getLinkProperties(network)?.linkAddresses ?: emptyList()
+        address.forEach { Log.d(TAG, it.address.hostAddress?.toString() ?: "") }
+    }
+
+    @Test
+    fun hasMobile() {
+        Assert.assertEquals(null, NetStateUtils.hasMobile(context, 5000L))
+    }
+
+    @Test
+    fun hasEtherNet() {
+        Assert.assertEquals(null, NetStateUtils.hasEtherNet(context, 5000L))
+    }
+
+    @Test
+    fun isMobile() {
+        Assert.assertTrue(NetStateUtils.isMobile(context))
+    }
+
+    @Test
+    fun isWIFI() {
         Assert.assertTrue(NetStateUtils.isWIFI(context))
+    }
+
+    @Test
+    fun isEtherNet() {
+        Assert.assertTrue(NetStateUtils.isEtherNet(context))
+    }
+
+    companion object {
+        const val TAG = "NET_STATE_UTILS"
     }
 
 }

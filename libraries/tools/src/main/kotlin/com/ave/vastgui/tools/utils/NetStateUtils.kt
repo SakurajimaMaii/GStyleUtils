@@ -28,9 +28,13 @@ import android.net.NetworkRequest
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.Build
-import androidx.annotation.RequiresApi
+import android.os.Looper
 import androidx.core.content.ContextCompat
 import com.ave.vastgui.tools.os.extension.fromApi31
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import java.net.Inet4Address
 import java.net.InetAddress
 import java.net.NetworkInterface
@@ -58,127 +62,203 @@ object NetStateUtils {
     }
 
     /**
-     * Get [NetworkInfo].
+     * Get [WifiManager].
+     *
+     * @since 0.5.3
+     */
+    fun Context.getWifiManager(): WifiManager =
+        applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+
+    /**
+     * Get [ConnectivityManager].
+     *
+     * @since 0.5.3
+     */
+    fun Context.getConnectivityManager(): ConnectivityManager =
+        getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    /**
+     * Get [NetworkInfo] of active network. When version is higher than
+     * [Build.VERSION_CODES.Q], `null` is always returned.
      *
      * @throws SecurityException Throw exception if there is no permission for
-     *     ACCESS_NETWORK_STATE.
-     * @see ConnectivityManager.getActiveNetworkInfo
+     * [ACCESS_NETWORK_STATE].
+     * @since 1.5.2
      */
     @JvmStatic
-    @Suppress("deprecation")
     @kotlin.jvm.Throws(SecurityException::class)
-    internal fun getNetWorkInfo(context: Context): NetworkInfo? {
-        if (ContextCompat.checkSelfPermission(context, ACCESS_NETWORK_STATE) != PERMISSION_GRANTED) {
+    internal fun Context.getActiveNetworkInfo(): NetworkInfo? {
+        if (ContextCompat.checkSelfPermission(this, ACCESS_NETWORK_STATE) != PERMISSION_GRANTED)
             throw SecurityException("Please apply the permission ACCESS_NETWORK_STATE.")
+        val manager = getConnectivityManager()
+        return when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> null
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ->
+                @Suppress("DEPRECATION") manager.getNetworkInfo(manager.activeNetwork)
+
+            else -> @Suppress("DEPRECATION") manager.activeNetworkInfo
         }
-        return context.getConnectivityManager().activeNetworkInfo
     }
 
     /**
-     * Get [NetworkCapabilities].
+     * Get [NetworkCapabilities]. Always returns `null` when version is lower
+     * than [Build.VERSION_CODES.M].
      *
      * @throws SecurityException Throw exception if there is no permission for
-     *     ACCESS_NETWORK_STATE.
-     * @see [ConnectivityManager.getNetworkCapabilities]
+     * [ACCESS_NETWORK_STATE].
+     * @since 1.5.2
      */
     @JvmStatic
-    @RequiresApi(Build.VERSION_CODES.Q)
     @kotlin.jvm.Throws(SecurityException::class)
-    internal fun getNetworkCapabilities(context: Context): NetworkCapabilities? {
-        if (ContextCompat.checkSelfPermission(context, ACCESS_NETWORK_STATE) != PERMISSION_GRANTED)
+    internal fun Context.getActiveNetworkCapabilities(): NetworkCapabilities? {
+        if (ContextCompat.checkSelfPermission(this, ACCESS_NETWORK_STATE) != PERMISSION_GRANTED)
             throw SecurityException("Please apply the permission ACCESS_NETWORK_STATE.")
-        return context.getConnectivityManager().let {
-            it.getNetworkCapabilities(it.activeNetwork)
+        val manager = getConnectivityManager()
+        return when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && null != manager.activeNetwork ->
+                manager.getNetworkCapabilities(manager.activeNetwork!!)
+
+            else -> null
         }
     }
 
+    // region Active default data network
 
     /**
-     * Is network available
+     * Is currently active default data network available.
      *
-     * @return True if network is available,false otherwise.
-     * @see getNetWorkInfo
-     * @see getNetworkCapabilities
+     * @return True if network is available, false otherwise.
      */
     @JvmStatic
     @kotlin.jvm.Throws(RuntimeException::class, SecurityException::class)
     fun isNetworkAvailable(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            val networkInfo = getNetWorkInfo(context) ?: return false
-            @Suppress("deprecation")
-            networkInfo.isConnected and networkInfo.isAvailable
-        } else {
-            val networkCapabilities = getNetworkCapabilities(context)
-            if (null != networkCapabilities) {
-                when {
-                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                    //for other device how are able to connect with Ethernet
-                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-                    //for check internet over Bluetooth
-                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) -> true
-                    else -> false
-                }
-            } else false
+        val networkInfo = context.getActiveNetworkInfo()
+        if (null != networkInfo) {
+            @Suppress("DEPRECATION")
+            return networkInfo.isConnected and networkInfo.isAvailable
         }
+        val networkCapabilities = context.getActiveNetworkCapabilities()
+        if (null != networkCapabilities) {
+            when {
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                // for other device how are able to connect with Ethernet
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+                // for check internet over Bluetooth
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) -> true
+                else -> false
+            }
+        }
+        return false
     }
 
     /**
-     * Is WIFI
+     * Whether the currently active default data network type is WIFI.
      *
-     * @return true if network is wifi mode,false otherwise.
-     * @see getNetWorkInfo
-     * @see getNetworkCapabilities
+     * @return true if network is wifi, false otherwise.
      */
     @JvmStatic
     @kotlin.jvm.Throws(RuntimeException::class, SecurityException::class)
     fun isWIFI(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            val networkInfo = getNetWorkInfo(context) ?: return false
-            @Suppress("deprecation")
-            networkInfo.type == ConnectivityManager.TYPE_WIFI
+            @Suppress("DEPRECATION")
+            context.getActiveNetworkInfo()?.type == ConnectivityManager.TYPE_WIFI
         } else {
-            val networkCapabilities = getNetworkCapabilities(context) ?: return false
-            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+            context.getActiveNetworkCapabilities()?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
         }
     }
 
     /**
-     * Is mobile net
+     * Whether the currently active default data network type is mobile net.
      *
-     * @param context context.
-     * @return true if network is wifi mode,false otherwise.
+     * @return true if network is mobile net, false otherwise.
      */
     @JvmStatic
     fun isMobile(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            val networkInfo = getNetWorkInfo(context) ?: return false
-            @Suppress("deprecation")
-            networkInfo.type == ConnectivityManager.TYPE_MOBILE
+            @Suppress("DEPRECATION")
+            context.getActiveNetworkInfo()?.type == ConnectivityManager.TYPE_MOBILE
         } else {
-            val networkCapabilities = getNetworkCapabilities(context) ?: return false
-            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+            context.getActiveNetworkCapabilities()?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
         }
     }
 
     /**
-     * Is ether net
+     * Whether the currently active default data network type is ether net.
      *
-     * @param context context.
-     * @return true if network is ether net,false otherwise.
+     * @return true if network is ether net, false otherwise.
      * @since 1.2.1
      */
     @JvmStatic
     fun isEtherNet(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            val networkInfo = getNetWorkInfo(context) ?: return false
-            @Suppress("deprecation")
-            networkInfo.type == ConnectivityManager.TYPE_MOBILE
+            @Suppress("DEPRECATION")
+            context.getActiveNetworkInfo()?.type == ConnectivityManager.TYPE_ETHERNET
         } else {
-            val networkCapabilities = getNetworkCapabilities(context) ?: return false
-            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+            context.getActiveNetworkCapabilities()?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true
         }
     }
+
+    // endregion
+
+    // region All network
+
+    /**
+     * Determine whether there is a WIFI connection within the specified time
+     * limit of [timeout], **regardless of whether the WIFI connection can be
+     * used to transfer of data**.
+     *
+     * @since 1.5.2
+     */
+    @JvmStatic
+    fun hasWIFI(context: Context, timeout: Long = 2000L): Network? = with(context) {
+        check(Looper.getMainLooper() != Looper.myLooper()) { "hasWIFI() should not be called on the main thread." }
+        return runBlocking(Dispatchers.IO) { networkCb(NetworkCapabilities.TRANSPORT_WIFI, timeout) }
+    }
+
+    /**
+     * Determine whether there is a cellular network within the specified time
+     * limit of [timeout].
+     *
+     * @since 1.5.2
+     */
+    @JvmStatic
+    fun hasMobile(context: Context, timeout: Long = 2000L): Network? = with(context) {
+        check(Looper.getMainLooper() != Looper.myLooper()) { "hasMobile() should not be called on the main thread." }
+        return runBlocking(Dispatchers.IO) { networkCb(NetworkCapabilities.TRANSPORT_CELLULAR, timeout) }
+    }
+
+    /**
+     * Determine whether there is a ethernet within the specified time
+     * limit of [timeout].
+     *
+     * @since 1.5.2
+     */
+    @JvmStatic
+    fun hasEtherNet(context: Context, timeout: Long = 2000L): Network? = with(context) {
+        check(Looper.getMainLooper() != Looper.myLooper()) { "hasMobile() should not be called on the main thread." }
+        return runBlocking(Dispatchers.IO) { networkCb(NetworkCapabilities.TRANSPORT_ETHERNET, timeout) }
+    }
+
+    private suspend fun Context.networkCb(type: Int, timeout: Long): Network? {
+        var network: Network? = null
+        withTimeoutOrNull(timeout) {
+            network = suspendCancellableCoroutine { coroutine ->
+                val manager = getConnectivityManager()
+                val request: NetworkRequest = NetworkRequest.Builder().addTransportType(type).build()
+                val cb = object : ConnectivityManager.NetworkCallback() {
+                    override fun onAvailable(network: Network) {
+                        coroutine.resumeWith(Result.success(network))
+                    }
+                }
+                manager.registerNetworkCallback(request, cb)
+                coroutine.invokeOnCancellation { manager.unregisterNetworkCallback(cb) }
+            }
+        }
+        return network
+    }
+
+    // endregion
 
     /**
      * Get wifi signal strength.
@@ -192,7 +272,7 @@ object NetStateUtils {
      * is represented by 0-[WifiManager.getMaxSignalLevel].
      *
      * @throws SecurityException Throw this exception if there is no
-     *     ACCESS_WIFI_STATE permission.
+     * [ACCESS_WIFI_STATE] permission.
      * @since 0.5.3
      */
     @JvmStatic
@@ -213,7 +293,8 @@ object NetStateUtils {
             return WIFIDBM.CURRENTDBM(wifiManager.calculateSignalLevelImpl(rssi, 5))
         } else {
             val wifiManager = context.getWifiManager()
-            val networkCapabilities = getNetworkCapabilities(context) ?: return WIFIDBM.UNSPECIFIED
+            val networkCapabilities = context.getActiveNetworkCapabilities()
+                ?: return WIFIDBM.UNSPECIFIED
             // Get wifi dbm when using vpn.
             // Must first check whether it is a VPN connection, otherwise an exception will
             // occur android.net.VpnTransportInfo cannot be cast to android.net.wifi.WifiInfo.
@@ -311,7 +392,7 @@ object NetStateUtils {
      *
      * @param rssi The power of the signal measured in RSSI.
      * @param numLevels Only useful when the [Build.VERSION.SDK_INT] is smaller
-     *     than 30.
+     * than 30.
      * @since 0.5.3
      */
     private fun WifiManager.calculateSignalLevelImpl(rssi: Int, numLevels: Int) = when {
@@ -322,22 +403,6 @@ object NetStateUtils {
         else ->
             calculateSignalLevel(rssi)
     }
-
-    /**
-     * Get [WifiManager].
-     *
-     * @since 0.5.3
-     */
-    private fun Context.getWifiManager(): WifiManager =
-        applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-
-    /**
-     * Get [ConnectivityManager].
-     *
-     * @since 0.5.3
-     */
-    private fun Context.getConnectivityManager(): ConnectivityManager =
-        getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     /**
      * Get the host ip.
