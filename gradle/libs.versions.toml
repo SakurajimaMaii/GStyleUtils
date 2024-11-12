@@ -16,7 +16,7 @@ core-ktx = "1.15.0"
 core-runtime = "2.2.0"
 core-splashscreen = "1.0.1"
 datastore-preferences = "1.1.1"
-desugar_jdk_libs = "2.1.2"
+desugar_jdk_libs = "2.1.3"
 dialogx = "0.0.49"
 dokka = "2.0.0-Beta"
 espresso-core = "3.6.1"
@@ -25,6 +25,7 @@ fastjson2 = "2.0.51.android5"
 fastjson2Kotlin = "2.0.51"
 fragment-ktx = "1.8.5"
 gson = "2.11.0"
+hutoolAll = "5.8.26"
 jackson-databind = "2.17.2"
 junit = "4.13.2"
 kotlin = "2.0.21"
@@ -32,7 +33,7 @@ kotlin-reflect = "2.0.21"
 kotlinx-coroutines-android = "1.8.1"
 kotlinx-coroutines-core = "1.9.0-RC.2"
 kotlinx-datetime = "0.6.0"
-kotlinx-serialization-json = "1.7.1"
+kotlinx-serialization-json = "1.7.3"
 kotlinxCoroutinesTest = "1.9.0-RC.2"
 ksp = "2.0.21-1.0.26"
 ktor = "3.0.0-beta-2"
@@ -90,13 +91,18 @@ fastjson2-kotlin = { module = "com.alibaba.fastjson2:fastjson2-kotlin", version.
 fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment-ktx" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+hutool-all = { module = "cn.hutool:hutool-all", version.ref = "hutoolAll" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-databind" }
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin-reflect" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin-reflect" }
+kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines-android" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
+kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor" }
 kotlinx-coroutines-rx3 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-rx3", version.ref = "kotlinx-coroutines-android" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
@@ -122,12 +128,16 @@ paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "pag
 paintedskin = { module = "com.github.CoderAlee.PaintedSkin:painted-skin", version.ref = "paintedskin" }
 paintedskin-constraintlayout-compat = { module = "com.github.CoderAlee.PaintedSkin:constraintlayout-compat", version.ref = "paintedskin" }
 paintedskin-standard-plugin = { module = "com.github.CoderAlee.PaintedSkin:standard-plugin", version.ref = "paintedskin" }
+reactor-kotlin-extensions = { module = "io.projectreactor.kotlin:reactor-kotlin-extensions" }
+reactor-test = { module = "io.projectreactor:reactor-test" }
 recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
 reflex = { module = "com.github.CoderAlee:Reflex", version.ref = "reflex" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 runtime-livedata-compose = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "compose" }
 security-crypto = { module = "androidx.security:security-crypto", version.ref = "security-crypto" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-starter-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
 ui-compose = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 ui-graphics-compose = { module = "androidx.compose.ui:ui-graphics", version.ref = "compose" }
 ui-test-manifest-compose = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose" }
