@@ -1,6 +1,6 @@
+
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
-import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ave.vastgui.tools.utils.NetStateUtils
@@ -34,6 +34,7 @@ import org.junit.runner.RunWith
 class NetStateUtilsTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val manager = context.getConnectivityManager()
 
     @Test
     fun getWifiManager() {
@@ -43,24 +44,6 @@ class NetStateUtilsTest {
     @Test
     fun getConnectivityManager() {
         Assert.assertEquals(ConnectivityManager::class.java, context.getConnectivityManager()::class.java)
-    }
-
-    @Test
-    fun hasWIFI() {
-        val network = NetStateUtils.hasWIFI(context)
-        val address = context.getConnectivityManager()
-            .getLinkProperties(network)?.linkAddresses ?: emptyList()
-        address.forEach { Log.d(TAG, it.address.hostAddress?.toString() ?: "") }
-    }
-
-    @Test
-    fun hasMobile() {
-        Assert.assertEquals(null, NetStateUtils.hasMobile(context, 5000L))
-    }
-
-    @Test
-    fun hasEtherNet() {
-        Assert.assertEquals(null, NetStateUtils.hasEtherNet(context, 5000L))
     }
 
     @Test
@@ -76,6 +59,31 @@ class NetStateUtilsTest {
     @Test
     fun isEtherNet() {
         Assert.assertTrue(NetStateUtils.isEtherNet(context))
+    }
+
+    @Test
+    fun isVPN() {
+        Assert.assertTrue(NetStateUtils.isVPN(context))
+    }
+
+    @Test
+    fun hasWIFI() {
+        Assert.assertEquals("WIFI", manager.getNetworkInfo(NetStateUtils.hasWIFI(context))?.typeName)
+    }
+
+    @Test
+    fun hasMobile() {
+        Assert.assertEquals("MOBILE", manager.getNetworkInfo(NetStateUtils.hasMobile(context))?.typeName)
+    }
+
+    @Test
+    fun hasEtherNet() {
+        Assert.assertEquals(null, NetStateUtils.hasEtherNet(context, 5000L))
+    }
+
+    @Test
+    fun hasVPN() {
+        Assert.assertEquals("VPN", manager.getNetworkInfo(NetStateUtils.hasVPN(context))?.typeName)
     }
 
     companion object {

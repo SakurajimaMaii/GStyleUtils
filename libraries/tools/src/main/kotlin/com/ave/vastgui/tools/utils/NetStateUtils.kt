@@ -17,7 +17,6 @@
 package com.ave.vastgui.tools.utils
 
 import android.Manifest.permission.ACCESS_NETWORK_STATE
-import android.Manifest.permission.ACCESS_WIFI_STATE
 import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.ConnectivityManager
@@ -30,11 +29,10 @@ import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Looper
 import androidx.core.content.ContextCompat
+import com.ave.vastgui.core.coroutines.suspendCoroutineWithTimeout
 import com.ave.vastgui.tools.os.extension.fromApi31
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withTimeoutOrNull
 import java.net.Inet4Address
 import java.net.InetAddress
 import java.net.NetworkInterface
@@ -159,13 +157,11 @@ object NetStateUtils {
      */
     @JvmStatic
     @kotlin.jvm.Throws(RuntimeException::class, SecurityException::class)
-    fun isWIFI(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            @Suppress("DEPRECATION")
-            context.getActiveNetworkInfo()?.type == ConnectivityManager.TYPE_WIFI
-        } else {
-            context.getActiveNetworkCapabilities()?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
-        }
+    fun isWIFI(context: Context): Boolean = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        @Suppress("DEPRECATION")
+        context.getActiveNetworkInfo()?.type == ConnectivityManager.TYPE_WIFI
+    } else {
+        context.getActiveNetworkCapabilities()?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
     }
 
     /**
@@ -174,13 +170,11 @@ object NetStateUtils {
      * @return true if network is mobile net, false otherwise.
      */
     @JvmStatic
-    fun isMobile(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            @Suppress("DEPRECATION")
-            context.getActiveNetworkInfo()?.type == ConnectivityManager.TYPE_MOBILE
-        } else {
-            context.getActiveNetworkCapabilities()?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
-        }
+    fun isMobile(context: Context): Boolean = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        @Suppress("DEPRECATION")
+        context.getActiveNetworkInfo()?.type == ConnectivityManager.TYPE_MOBILE
+    } else {
+        context.getActiveNetworkCapabilities()?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
     }
 
     /**
@@ -190,75 +184,34 @@ object NetStateUtils {
      * @since 1.2.1
      */
     @JvmStatic
-    fun isEtherNet(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            @Suppress("DEPRECATION")
-            context.getActiveNetworkInfo()?.type == ConnectivityManager.TYPE_ETHERNET
-        } else {
-            context.getActiveNetworkCapabilities()?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true
+    fun isEtherNet(context: Context): Boolean = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        @Suppress("DEPRECATION")
+        context.getActiveNetworkInfo()?.type == ConnectivityManager.TYPE_ETHERNET
+    } else {
+        context.getActiveNetworkCapabilities()?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true
+    }
+
+    /**
+     * Whether the currently active default data network type is vpn.
+     *
+     * @return true if network is vpn, false otherwise.
+     * @since 1.5.2
+     */
+    @Suppress("DEPRECATION")
+    fun isVPN(context: Context): Boolean = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        if (ContextCompat.checkSelfPermission(context, ACCESS_NETWORK_STATE) != PERMISSION_GRANTED)
+            throw SecurityException("Please apply the permission ACCESS_NETWORK_STATE.")
+        val manager = context.getConnectivityManager()
+        val netInfo = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ->
+                manager.getNetworkInfo(manager.activeNetwork)
+
+            else -> manager.getNetworkInfo(ConnectivityManager.TYPE_VPN)
         }
+        netInfo?.type == ConnectivityManager.TYPE_VPN
+    } else {
+        context.getActiveNetworkCapabilities()?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true
     }
-
-    // endregion
-
-    // region All network
-
-    /**
-     * Determine whether there is a WIFI connection within the specified time
-     * limit of [timeout], **regardless of whether the WIFI connection can be
-     * used to transfer of data**.
-     *
-     * @since 1.5.2
-     */
-    @JvmStatic
-    fun hasWIFI(context: Context, timeout: Long = 2000L): Network? = with(context) {
-        check(Looper.getMainLooper() != Looper.myLooper()) { "hasWIFI() should not be called on the main thread." }
-        return runBlocking(Dispatchers.IO) { networkCb(NetworkCapabilities.TRANSPORT_WIFI, timeout) }
-    }
-
-    /**
-     * Determine whether there is a cellular network within the specified time
-     * limit of [timeout].
-     *
-     * @since 1.5.2
-     */
-    @JvmStatic
-    fun hasMobile(context: Context, timeout: Long = 2000L): Network? = with(context) {
-        check(Looper.getMainLooper() != Looper.myLooper()) { "hasMobile() should not be called on the main thread." }
-        return runBlocking(Dispatchers.IO) { networkCb(NetworkCapabilities.TRANSPORT_CELLULAR, timeout) }
-    }
-
-    /**
-     * Determine whether there is a ethernet within the specified time
-     * limit of [timeout].
-     *
-     * @since 1.5.2
-     */
-    @JvmStatic
-    fun hasEtherNet(context: Context, timeout: Long = 2000L): Network? = with(context) {
-        check(Looper.getMainLooper() != Looper.myLooper()) { "hasMobile() should not be called on the main thread." }
-        return runBlocking(Dispatchers.IO) { networkCb(NetworkCapabilities.TRANSPORT_ETHERNET, timeout) }
-    }
-
-    private suspend fun Context.networkCb(type: Int, timeout: Long): Network? {
-        var network: Network? = null
-        withTimeoutOrNull(timeout) {
-            network = suspendCancellableCoroutine { coroutine ->
-                val manager = getConnectivityManager()
-                val request: NetworkRequest = NetworkRequest.Builder().addTransportType(type).build()
-                val cb = object : ConnectivityManager.NetworkCallback() {
-                    override fun onAvailable(network: Network) {
-                        coroutine.resumeWith(Result.success(network))
-                    }
-                }
-                manager.registerNetworkCallback(request, cb)
-                coroutine.invokeOnCancellation { manager.unregisterNetworkCallback(cb) }
-            }
-        }
-        return network
-    }
-
-    // endregion
 
     /**
      * Get wifi signal strength.
@@ -282,9 +235,6 @@ object NetStateUtils {
         // See https://developer.android.com/reference/android/net/wifi/WifiManager#getConnectionInfo()
         // for the deprecate information.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            if (ContextCompat.checkSelfPermission(context, ACCESS_WIFI_STATE) != PERMISSION_GRANTED) {
-                throw SecurityException("Please apply the permission ACCESS_WIFI_STATE.")
-            }
             val wifiManager = context.getWifiManager()
 
             @Suppress("deprecation")
@@ -348,6 +298,91 @@ object NetStateUtils {
         } else if (isEtherNet(context)) return getHostIp()
         else return null
     }
+
+    // endregion
+
+    // region All network
+
+    /**
+     * Determine whether there is a WIFI connection within the specified time
+     * limit of [timeout], **regardless of whether the WIFI connection can be
+     * used to transfer of data**.
+     *
+     * @since 1.5.2
+     */
+    @JvmStatic
+    fun hasWIFI(context: Context, timeout: Long = 2000L): Network? = with(context) {
+        check(Looper.getMainLooper() != Looper.myLooper()) { "hasWIFI() should not be called on the main thread." }
+        return runBlocking(Dispatchers.IO) { networkCb(NetworkCapabilities.TRANSPORT_WIFI, timeout) }
+    }
+
+    /**
+     * Determine whether there is a cellular network within the specified time
+     * limit of [timeout].
+     *
+     * @since 1.5.2
+     */
+    @JvmStatic
+    fun hasMobile(context: Context, timeout: Long = 2000L): Network? = with(context) {
+        check(Looper.getMainLooper() != Looper.myLooper()) { "hasMobile() should not be called on the main thread." }
+        return runBlocking(Dispatchers.IO) { networkCb(NetworkCapabilities.TRANSPORT_CELLULAR, timeout) }
+    }
+
+    /**
+     * Determine whether there is a ethernet within the specified time limit of
+     * [timeout].
+     *
+     * @since 1.5.2
+     */
+    @JvmStatic
+    fun hasEtherNet(context: Context, timeout: Long = 2000L): Network? = with(context) {
+        check(Looper.getMainLooper() != Looper.myLooper()) { "hasMobile() should not be called on the main thread." }
+        return runBlocking(Dispatchers.IO) { networkCb(NetworkCapabilities.TRANSPORT_ETHERNET, timeout) }
+    }
+
+    /**
+     * Determine whether there is a vpn within the specified time limit of
+     * [timeout].
+     *
+     * @since 1.5.2
+     */
+    @JvmStatic
+    fun hasVPN(context: Context, timeout: Long = 2000L): Network? = with(context) {
+        check(Looper.getMainLooper() != Looper.myLooper()) { "hasMobile() should not be called on the main thread." }
+        return runBlocking(Dispatchers.IO) {
+            suspendCoroutineWithTimeout<Network>(timeout) { coroutine ->
+                val manager = getConnectivityManager()
+                // https://android.googlesource.com/platform/cts/+/4a305d5%5E%21/
+                val request: NetworkRequest = NetworkRequest.Builder()
+                    .addTransportType(NetworkCapabilities.TRANSPORT_VPN)
+                    .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
+                    .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                    .build()
+                val cb = object : ConnectivityManager.NetworkCallback() {
+                    override fun onAvailable(network: Network) {
+                        coroutine.resumeWith(Result.success(network))
+                    }
+                }
+                manager.requestNetwork(request, cb)
+                coroutine.invokeOnCancellation { manager.unregisterNetworkCallback(cb) }
+            }
+        }
+    }
+
+    private suspend fun Context.networkCb(type: Int, timeout: Long): Network? =
+        suspendCoroutineWithTimeout(timeout) { coroutine ->
+            val manager = getConnectivityManager()
+            val request: NetworkRequest = NetworkRequest.Builder().addTransportType(type).build()
+            val cb = object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    coroutine.resumeWith(Result.success(network))
+                }
+            }
+            manager.requestNetwork(request, cb)
+            coroutine.invokeOnCancellation { manager.unregisterNetworkCallback(cb) }
+        }
+
+    // endregion
 
     /**
      * Convert ipv4 to int, for example, 255.255.255.255 will be converted to
