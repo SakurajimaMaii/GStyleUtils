@@ -48,7 +48,7 @@ import kotlin.contracts.contract
 @OptIn(ExperimentalContracts::class)
 inline fun <T> T?.letThenNull(crossinline block: (T) -> Unit): Nothing? {
     contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
     this?.let { block(it) }
     return null

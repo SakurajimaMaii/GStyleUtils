@@ -48,7 +48,9 @@ sourceSets["main"].java.srcDir("src/main/kotlin")
 
 dependencies {
     implementation(libs.kotlin.reflect)
+    implementation(libs.kotlinx.coroutines.core)
     testImplementation(kotlin("test"))
+    testImplementation(libs.kotlinx.coroutines.test)
 }
 
 extra["PUBLISH_ARTIFACT_ID"] = "VastCore"
