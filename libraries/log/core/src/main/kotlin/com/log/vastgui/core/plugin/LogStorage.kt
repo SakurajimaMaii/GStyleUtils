@@ -108,16 +108,13 @@ class LogStorage private constructor(private val mConfiguration: Configuration) 
         }
 
         override fun install(plugin: LogStorage, scope: LogCat) {
-            scope.logPipeline.intercept(LogPipeline.State) {
-                if (plugin.mLevelMap[subject.level] == false) {
-                    finish()
-                }
-            }
             val store = PipelinePhase("Store")
             scope.logPipeline.insertPhaseAfter(LogPipeline.Output, store)
             scope.logPipeline.intercept(store) {
-                plugin.storeLog(subject.build())
-                proceed()
+                if (plugin.mLevelMap[subject.level] == true) {
+                    plugin.storeLog(subject.build())
+                    proceed()
+                }
             }
         }
 

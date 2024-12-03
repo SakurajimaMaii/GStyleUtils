@@ -45,6 +45,6 @@ val logFactory: LogFactory = getLogFactory {
         logStore = LogStore.desktop("", 1024L * 1000)
     }
     install(LogJson) {
-        converter = GsonConverter.getInstance(false)
+        converter = GsonConverter.getInstance(true)
     }
 }
