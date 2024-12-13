@@ -23,13 +23,12 @@ package com.log.vastgui.desktop;
 import static com.log.vastgui.desktop.LogFactoryKt.logFactory;
 
 import com.log.vastgui.core.LogCat;
-import com.sun.tools.javac.Main;
 
 import org.junit.Test;
 
-public class JavaUnitTest {
+public class DesktopTest {
 
-    private static final LogCat logcat = logFactory.getLogCat(Main.class);
+    private static final LogCat logcat = logFactory.invoke("DesktopTest");
 
     @Test
     public void logTest() {

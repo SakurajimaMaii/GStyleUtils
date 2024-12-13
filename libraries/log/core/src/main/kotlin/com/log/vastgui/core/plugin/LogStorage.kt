@@ -102,23 +102,20 @@ class LogStorage private constructor(private val mConfiguration: Configuration) 
 
         override val key: String = LogStorage::class.java.simpleName
 
-        override fun install(plugin: LogStorage, scope: LogCat) {
-            scope.logPipeline.intercept(LogPipeline.State) {
-                if (plugin.mLevelMap[subject.level] == false) {
-                    finish()
-                }
-            }
-            val store = PipelinePhase("Store")
-            scope.logPipeline.insertPhaseAfter(LogPipeline.Output, store)
-            scope.logPipeline.intercept(store) {
-                plugin.storeLog(subject.logInfo)
-                proceed()
-            }
-        }
-
         override fun configuration(config: Configuration.() -> Unit): LogStorage {
             val configuration = Configuration().also(config)
             return LogStorage(configuration)
+        }
+
+        override fun install(plugin: LogStorage, scope: LogCat) {
+            val store = PipelinePhase("Store")
+            scope.logPipeline.insertPhaseAfter(LogPipeline.Output, store)
+            scope.logPipeline.intercept(store) {
+                if (plugin.mLevelMap[subject.level] == true) {
+                    plugin.storeLog(subject.build())
+                    proceed()
+                }
+            }
         }
 
     }

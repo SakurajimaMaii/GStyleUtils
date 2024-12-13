@@ -81,7 +81,7 @@ dependencies {
 extra["PUBLISH_ARTIFACT_ID"] = "log-mars"
 extra["PUBLISH_DESCRIPTION"] = "Tencent xlog for log"
 extra["PUBLISH_URL"] =
-    "https://github.com/SakurajimaMaii/Android-Vast-Extension/tree/develop/libraries/log/core"
+    "https://github.com/SakurajimaMaii/Android-Vast-Extension/tree/develop/libraries/log/mars"
 
 val mavenPropertiesFile = File(rootDir, "maven.properties")
 if (mavenPropertiesFile.exists()) {
@@ -90,7 +90,7 @@ if (mavenPropertiesFile.exists()) {
             register<MavenPublication>("release") {
                 groupId = "io.github.sakurajimamaii"
                 artifactId = "log-mars"
-                version = "1.3.6"
+                version = "1.3.10"
 
                 afterEvaluate {
                     from(components["release"])
