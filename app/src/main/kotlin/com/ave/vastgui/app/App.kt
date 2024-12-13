@@ -43,7 +43,6 @@ class App : Application() {
         DialogX.init(this)
         registerLifecycleLogcat { tag, event, bundle ->
             mLogcat.i(LogTag(tag), "$event $bundle")
-            // Log.i(tag, "$event $bundle")
         }
 //        WindowManager.getInstance().init(this, OptionFactory())
 //        ThemeSkinService.getInstance().apply {

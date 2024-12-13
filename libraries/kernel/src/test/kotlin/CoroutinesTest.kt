@@ -2,6 +2,7 @@ import com.ave.vastgui.core.coroutines.suspendCoroutineWithTimeout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlin.concurrent.thread
@@ -52,37 +53,28 @@ import kotlin.test.assertEquals
 class CoroutinesTest {
 
     @Test
-    fun basic() = runTest {
-        println(exchangeContext())
-    }
+    fun cancellableTimeout() = runTest {
+        val result = withContext(Dispatchers.IO) {
+            suspendCoroutineWithTimeout(7000L) { coroutine ->
+                simulateRequest(object : Callback<String> {
+                    override fun onSuccess(t: String) {
+                        coroutine.resumeWith(Result.success(t))
+                    }
 
-    private suspend fun exchangeContext() = withContext(Dispatchers.IO) {
-        delay(2000L)
-        return@withContext "Hello World"
-    }
-
-    @Test
-    fun cancellableTimeout() = runBlocking {
-        val result = suspendCoroutineWithTimeout<String>(7000L) { coroutine ->
-            longTimeMethod(object : Callback<String> {
-                override fun onSuccess(it: String) {
-                    if (coroutine.isCancelled) return
-                    coroutine.resumeWith(Result.success(it))
-                }
-
-                override fun onFailed(e: Exception) {
-                    coroutine.resumeWithException(e)
-                }
-            })
+                    override fun onFailed(e: Exception) {
+                        coroutine.resumeWithException(e)
+                    }
+                })
+            }
         }
-        assertEquals("Hello World", result)
+        assertEquals(RESPONSE_STRING, result)
     }
 
-    fun longTimeMethod(result: Callback<String>) {
+    private fun simulateRequest(result: Callback<String>) {
         thread {
             Thread.sleep(5000)
             if (Random(System.currentTimeMillis()).nextLong(0, 100) > 0) {
-                result.onSuccess("Hello World")
+                result.onSuccess(RESPONSE_STRING)
             } else {
                 result.onFailed(Exception("FAILED"))
             }
@@ -92,6 +84,10 @@ class CoroutinesTest {
     interface Callback<T> {
         fun onSuccess(t: T)
         fun onFailed(e: Exception)
+    }
+
+    companion object {
+        private const val RESPONSE_STRING = "Hello World"
     }
 
 }
