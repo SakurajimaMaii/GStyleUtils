@@ -34,7 +34,7 @@ class LogInfoFactory @LogApi constructor(
     internal val stackTrace: StackTraceElement,
     internal val tr: Throwable? = null
 ) {
-    internal lateinit var logInfo: LogInfo
+    private var logInfo: LogInfo? = null
 
     /**
      * [String] or lazy String (() -> String)
@@ -76,17 +76,14 @@ class LogInfoFactory @LogApi constructor(
         return rawContentOrLazy as String
     }
 
-    /** @since 1.3.4 */
-    fun build(): LogInfo {
-        check(!::logInfo.isInitialized) { "logInfo has been initialized." }
-        return LogInfo(
-            threadName,
-            stackTrace,
-            level,
-            tag,
-            System.currentTimeMillis(),
-            content() as String,
-            tr
-        ).also { logInfo = it }
-    }
+    /**
+     * Get the [LogInfo] built by [LogInfoFactory], if [LogInfo] is not
+     * initialized then build it first and assign it to [logInfo], otherwise
+     * return [logInfo].
+     *
+     * @since 1.3.4
+     */
+    fun build(): LogInfo = logInfo ?: LogInfo(threadName, stackTrace, level, tag,
+        System.currentTimeMillis(), content() as String, tr).also { logInfo = it }
+
 }
