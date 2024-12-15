@@ -17,8 +17,6 @@
 package com.ave.vastgui.core
 
 import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
@@ -35,7 +33,6 @@ import kotlin.contracts.contract
  * ```
  *
  * The code above is equivalent to the following example:
- *
  * ```kotlin
  * if (null != resource) {
  *     ... // Do something with non-null resource
@@ -46,10 +43,7 @@ import kotlin.contracts.contract
  * @since 0.1.2
  */
 @OptIn(ExperimentalContracts::class)
-inline fun <T> T?.letThenNull(crossinline block: (T) -> Unit): Nothing? {
-    contract {
-        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
-    }
+inline fun <T, R> T?.letThenNull(crossinline block: (T) -> R): Nothing? {
     this?.let { block(it) }
     return null
 }
