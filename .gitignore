@@ -28,6 +28,7 @@ docs/
 
 /local.properties
 /maven.properties
+/gradle.properties
 
 .DS_Store
 /build
