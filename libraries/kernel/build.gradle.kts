@@ -26,7 +26,7 @@ plugins {
 }
 
 group = "io.github.sakurajimamaii"
-version = "0.1.2"
+version = "0.1.3"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -65,7 +65,7 @@ if (mavenPropertiesFile.exists()) {
             register<MavenPublication>("release") {
                 groupId = "io.github.sakurajimamaii"
                 artifactId = "VastCore"
-                version = "0.1.2"
+                version = "0.1.3"
 
                 afterEvaluate {
                     from(components["java"])

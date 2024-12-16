@@ -16,8 +16,6 @@
 
 package com.ave.vastgui.core
 
-import kotlin.contracts.ExperimentalContracts
-
 // Author: Vast Gui
 // Email: guihy2019@gmail.com
 // Date: 2024/10/28
@@ -42,7 +40,6 @@ import kotlin.contracts.ExperimentalContracts
  *
  * @since 0.1.2
  */
-@OptIn(ExperimentalContracts::class)
 inline fun <T, R> T?.letThenNull(crossinline block: (T) -> R): Nothing? {
     this?.let { block(it) }
     return null
