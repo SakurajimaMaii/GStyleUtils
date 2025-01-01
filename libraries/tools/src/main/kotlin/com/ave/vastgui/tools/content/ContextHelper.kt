@@ -17,6 +17,7 @@
 package com.ave.vastgui.tools.content
 
 import android.app.Application
+import android.content.ContentResolver
 import android.content.Context
 
 // Author: Vast Gui
@@ -62,5 +63,12 @@ object ContextHelper {
         if (!ContextHelper::application.isInitialized) {
             throw UninitializedPropertyAccessException("application is not init, please call ToolsConfig.init()")
         } else application.applicationContext
+
+    /**
+     * Get [ContentResolver] by [getAppContext]
+     *
+     * @since 1.5.2
+     */
+    fun getContentResolver(): ContentResolver = getAppContext().contentResolver
 
 }

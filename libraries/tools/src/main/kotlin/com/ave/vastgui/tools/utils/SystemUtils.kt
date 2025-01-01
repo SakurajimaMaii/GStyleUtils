@@ -17,6 +17,8 @@
 package com.ave.vastgui.tools.utils
 
 import android.os.Build
+import android.provider.Settings
+import com.ave.vastgui.tools.content.ContextHelper
 import java.util.Locale
 
 // Author: Vast Gui
@@ -63,9 +65,19 @@ object SystemUtils {
 
     /**
      * @return the consumer-visible brand with which the product/hardware will
-     *     be associated, if any.
+     * be associated, if any.
      */
     @JvmStatic
     val deviceBrand: String
         get() = Build.BRAND
+}
+
+/**
+ * Whether Airplane Mode is on.
+ *
+ * @since 1.5.2
+ */
+fun isAirplaneMode(): Boolean {
+    return Settings.System
+        .getInt(ContextHelper.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0) == 1
 }

@@ -26,6 +26,12 @@ import androidx.annotation.ChecksSdkIntAtLeast
 // Date: 2024/3/27 23:59
 // Documentation: https://ave.entropy2020.cn/documents/tools/core-topics/os/extension/build/
 
+/** @since 1.5.2 */
+@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.VANILLA_ICE_CREAM)
+inline fun fromApi35(action: () -> Unit) {
+    fromApi(Build.VERSION_CODES.VANILLA_ICE_CREAM, action)
+}
+
 /** @since 1.2.1 */
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 inline fun fromApi34(action: () -> Unit) {

@@ -59,6 +59,8 @@ tools = "1.5.1"
 vastnetstatelayout = "1.1.2"
 versionedparcelable = "1.2.0"
 zxing = "3.5.3"
+rules = "1.6.1"
+junitKtx = "1.2.1"
 
 [libraries]
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-ktx" }
@@ -146,6 +148,8 @@ vastcore = { module = "io.github.sakurajimamaii:VastCore", version.ref = "core" 
 vastnetstatelayout = { module = "io.github.sakurajimamaii:VastNetStateLayout", version.ref = "vastnetstatelayout" }
 vasttools = { module = "io.github.sakurajimamaii:VastTools", version.ref = "tools" }
 zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
+androidx-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

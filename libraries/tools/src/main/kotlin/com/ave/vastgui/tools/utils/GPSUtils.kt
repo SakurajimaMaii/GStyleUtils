@@ -34,6 +34,11 @@ import com.ave.vastgui.tools.content.ContextHelper
  * @return True if GPS is turned on, false otherwise.
  * @since 0.5.3
  */
+@Deprecated(
+    level = DeprecationLevel.WARNING,
+    replaceWith = ReplaceWith("isLocationEnabled()", "com.ave.vastgui.tools.utils.isLocationEnabled"),
+    message = "Use the LocationManagerCompat instead."
+)
 fun isGPSOpen(): Boolean {
     val locationManager: LocationManager = cast(
         ContextHelper.getAppContext()

@@ -108,8 +108,10 @@ dependencies {
     implementation(libs.recyclerview)
     implementation(libs.retrofit)
     implementation(projects.libraries.kernel)
+    androidTestImplementation("androidx.test:rules:1.6.1")
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.junit.ktx)
     testImplementation(libs.junit)
 }
 
