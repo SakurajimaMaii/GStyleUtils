@@ -411,28 +411,36 @@ object FileMgr {
     }
 
     /**
-     * Get assets cache file.
+     * Save [fileName] in assets to the folder specified by [dir].
      *
-     * @param fileName The assets file name.
-     * @param dir The dir where the file saved.
      * @since 0.5.1
      */
+    @Deprecated(
+        level = DeprecationLevel.WARNING,
+        message = "Use the return file with ResultCompat.",
+        replaceWith = ReplaceWith("getAssetsFile(fileName, dir, DEFAULT_BUFFER_SIZE)")
+    )
+    fun getAssetsFile(fileName: String, dir: File = appInternalFilesDir()): File =
+        getAssetsFile(fileName, dir, DEFAULT_BUFFER_SIZE).getOrThrow()
+
+    /**
+     * Save [fileName] in assets to the folder specified by [dir].
+     *
+     * @since 1.5.2
+     */
     @JvmStatic
-    fun getAssetsFile(fileName: String, dir: File = appInternalFilesDir()): File {
-        val saveFile = File(dir, fileName)
+    fun getAssetsFile(fileName: String, dir: File = appInternalFilesDir(), bufferSize: Int = DEFAULT_BUFFER_SIZE): ResultCompat<File> {
         try {
-            ContextHelper.getAppContext().assets.open(fileName).use { inputStream ->
-                FileOutputStream(saveFile).use { outputStream ->
-                    val buf = ByteArray(1024)
-                    var len: Int
-                    while (inputStream.read(buf).also { len = it } > 0) {
-                        outputStream.write(buf, 0, len)
-                    }
+            val duplicate = File(dir, fileName)
+            val context = ContextHelper.getAppContext()
+            context.assets.open(fileName).use { input ->
+                FileOutputStream(duplicate).use { output ->
+                    input.copyTo(output, bufferSize)
                 }
             }
-            return saveFile
+            return ResultCompat.success(duplicate)
         } catch (exception: Exception) {
-            throw exception
+            return ResultCompat.failure(RuntimeException("Get assets file failed.", exception))
         }
     }
 
